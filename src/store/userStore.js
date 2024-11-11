@@ -31,8 +31,7 @@ export const useUserStore = defineStore('user', {
     },
 
     async updateUser(userId, user) {
-      console.log("Updating user with ID:", userId); // Debugging
-        console.log("User data to update:", user); // 
+      console.log("Données utilisateur à mettre à jour:", user);
       try {
         await axiosInstance.put(`/users/edit/${userId}`, user);
         await this.fetchUsers();
@@ -40,6 +39,7 @@ export const useUserStore = defineStore('user', {
         this.error = "Erreur lors de la mise à jour de l'utilisateur";
       }
     },
+    
 
     async getByIdUser(userId) {
       try {

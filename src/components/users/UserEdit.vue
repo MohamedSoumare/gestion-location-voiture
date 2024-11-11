@@ -69,12 +69,13 @@ onMounted(async () => {
 
 const updateUser = async () => {
   try {
+    console.log("Statut avant mise à jour:", form.status);  // Vérification du statut
     await store.updateUser(route.params.id, {
       fullName: form.fullName,
       email: form.email,
       phoneNumber: form.phoneNumber,
       role: form.role,
-      status: form.status,
+      status: form.status, // Envoie le statut sélectionné
     });
     router.push({ name: 'UserList' });
   } catch (error) {
