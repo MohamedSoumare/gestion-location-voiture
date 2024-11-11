@@ -34,7 +34,7 @@ export const useVehicleStore = defineStore('vehicle', {
     async getVehicleById(id) {
       try {
         const response = await axiosInstance.get(`/vehicles/${id}`);
-        return response.data; // Retourne le véhicule spécifique
+        return response.data; // Vérifiez que cela retourne les bonnes données
       } catch (error) {
         console.error("Erreur lors du chargement du véhicule :", error);
         throw error;

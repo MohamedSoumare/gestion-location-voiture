@@ -27,7 +27,7 @@
               <strong>Carburant :</strong> {{ vehicle.fuelType }}<br />
               <strong>Transmission :</strong> {{ vehicle.transmissionType }}<br />
               <strong>Climatisation :</strong> {{ vehicle.airConditioning ? 'Oui' : 'Non' }}<br />
-              <strong>Tarif journalier :</strong> {{ vehicle.dailyRate }} €
+              <strong>Tarif journalier :</strong> {{ vehicle.dailyRate }} MRU
             </p>
             <div class="d-flex justify-content-between">
               <button  @click="viewDetails(vehicle.id)" class="btn btn-outline-primary btn-sm">

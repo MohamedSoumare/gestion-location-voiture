@@ -74,39 +74,39 @@
     </form>
   </div>
 </template>
+
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useVehicleStore } from '../../store/vehicleStore';
 import { useRouter, useRoute } from 'vue-router';
 
-    const vehicleStore = useVehicleStore();
-    const router = useRouter();
-    const route = useRoute();
-    const vehicle = ref({
-      brand: '',
-      model: '',
-      year: '',
-      registrationPlate: '',
-      status: '',
-      seatCount: 0,
-      doorCount: 0,
-      color: '',
-      fuelType: '',
-      transmissionType: '',
-      airConditioning: false,
-      dailyRate: 0.0
-    });
+const vehicleStore = useVehicleStore();
+const router = useRouter();
+const route = useRoute();
+const vehicle = ref({
+  brand: '',
+  model: '',
+  year: '',
+  registrationPlate: '',
+  status: '',
+  seatCount: 0,
+  doorCount: 0,
+  color: '',
+  fuelType: '',
+  transmissionType: '',
+  airConditioning: false,
+  dailyRate: 0.0
+});
 
 onMounted(async () => {
   try {
     const vehicleId = route.params.id;
-    await vehicleStore.getVehicleById(vehicleId);
-    Object.assign(vehicle.value, vehicleStore.vehicles);
+    const vehicleData = await vehicleStore.getVehicleById(vehicleId);
+    Object.assign(vehicle.value, vehicleData); // Assigne les données récupérées directement
   } catch (error) {
     console.error("Erreur lors de la récupération des données du véhicule :", error);
   }
 });
-
 
 const submitForm = async () => {
   try {
@@ -116,11 +116,10 @@ const submitForm = async () => {
     console.error("Erreur lors de la mise à jour du véhicule :", error);
   }
 };
-    function goBack() {
-      router.push({ name: 'ListVehicle' });
-    }
 
-  
+function goBack() {
+  router.push({ name: 'ListVehicle' });
+}
 </script>
 
 <style scoped>
