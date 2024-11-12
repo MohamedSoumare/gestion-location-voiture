@@ -30,13 +30,13 @@
           <td>{{ contract.totalAmount }} €</td>
           <td>{{ contract.status }}</td>
           <td>
-            <button @click="viewContract(contract.id)" class="btn btn-sm text-info me-2">
+            <button @click="viewContract(contract.id)" class="btn btn-sm btn-outline-primary me-2">
               <i class="fas fa-eye"></i>
             </button>
-            <button @click="editContract(contract.id)" class="btn btn-sm text-warning me-2">
+            <button @click="editContract(contract.id)" class="btn btn-sm btn-outline-secondary me-2">
               <i class="fas fa-edit"></i>
             </button>
-            <button @click="confirmDelete(contract.id)" class="btn btn-sm text-danger">
+            <button @click="confirmDelete(contract.id)" class="btn btn-sm btn-outline-danger me-2">
               <i class="fas fa-trash"></i>
             </button>
           </td>

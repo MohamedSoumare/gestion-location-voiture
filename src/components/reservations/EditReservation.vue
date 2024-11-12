@@ -46,8 +46,9 @@
           <option value="ongoing">En cours</option>
         </select>
       </div>
-
-      <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+      <div class="d-flex justify-content-center mt-4">
+      <button type="submit" class="btn btn-primary">Enregistrer</button>
+      <button @click.prevent="goBack" class="btn btn-secondary">Annuler</button></div>
     </form>
   </div>
 </template>
@@ -126,12 +127,15 @@ const handleEditReservation = async () => {
     console.error("Erreur lors de la modification de la réservation :", error);
   }
 };
-
+const goBack = () => router.push({ name: 'ListReservation' });
 </script>
 
 <style scoped>
 .container {
   max-width: 800px;
   margin-top: 5%;
+}
+button {
+ margin: 10px;
 }
 </style>

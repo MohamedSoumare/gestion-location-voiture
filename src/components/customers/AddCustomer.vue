@@ -1,7 +1,7 @@
 <template>
-  <div class="container mt-5">
-    <h2>Ajouter un Client</h2>
-    <form @submit.prevent="saveCustomer" class="mt-5">
+  <div class="container mt-5 p-4 border rounded bg-light shadow">
+    <h2 class="text-center text-primary mb-4">Ajouter un Client</h2>
+    <form @submit.prevent="saveCustomer" class="mt-4">
       <!-- Formulaire pour ajouter un client -->
       <div class="mb-3">
         <label class="form-label">Nom</label>
@@ -27,15 +27,17 @@
         <label class="form-label">Téléphone</label>
         <input v-model="customer.phoneNumber" type="text" class="form-control" required />
       </div>
-      <button type="submit" class="btn btn-success">Confirmer</button>
-      <button @click.prevent="goBack" class="btn btn-secondary ms-2">Annuler</button>
+      <div class="d-flex justify-content-center mt-4">
+        <button type="submit" class="btn btn-success me-2">Confirmer</button>
+        <button @click.prevent="goBack" class="btn btn-secondary">Annuler</button>
+      </div>
     </form>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue';
-
+import Swal from 'sweetalert2';
 import { useCustomerStore } from '../../store/customerStore';
 import { useRouter } from 'vue-router';
 
@@ -52,8 +54,14 @@ const customer = ref({
 });
 
 const saveCustomer = async () => {
-  await store.addCustomer(customer.value);
-  router.push({ name: 'CustomerList' });
+  try {
+    await store.addCustomer(customer.value);
+    Swal.fire('Succès', 'Client ajouté avec succès!', 'success');
+    router.push({ name: 'CustomerList' });
+  } catch (error) {
+    console.error("Erreur lors de l'ajout du client", error);
+    Swal.fire('Erreur', 'Une erreur est survenue lors de l\'ajout du client.', 'error');
+  }
 };
 
 const goBack = () => router.push({ name: 'CustomerList' });
@@ -61,7 +69,14 @@ const goBack = () => router.push({ name: 'CustomerList' });
 
 <style scoped>
 .container {
-  max-width: 1000px;
+  max-width: 600px;
   margin: auto;
+  background-color: #f8f9fa;
+}
+.form-label {
+  font-weight: bold;
+}
+button {
+  width: 120px;
 }
 </style>

@@ -32,7 +32,7 @@
       </div>
       <div class="d-flex justify-content-between">
         <router-link :to="{ name: 'UserList' }" class="btn btn-secondary">Annuler</router-link>
-        <button type="submit" class="btn btn-success">Ajouter l'utilisateur</button>
+        <button type="submit" class="btn btn-success">Ajouter</button>
       </div>
     </form>
   </div>

@@ -1,18 +1,21 @@
-<!-- src/components/customers/DetailCustomer.vue -->
 <template>
-  <div class="container mt-5">
-    <h2>Détails du Client</h2>
-    <div v-if="customer" class="mt-4">
-      <p><strong>Nom :</strong> {{ customer.fullName }}</p>
-      <p><strong>Adresse :</strong> {{ customer.address }}</p>
-      <p><strong>NNI :</strong> {{ customer.nni }}</p>
-      <p><strong>Date de Naissance :</strong> {{ formatDate(customer.birthDate) }}</p>
-      <p><strong>Permis de Conduire :</strong> {{ customer.drivingLicense }}</p>
-      <p><strong>Téléphone :</strong> {{ customer.phoneNumber }}</p>
-      <button @click="goBack" class="btn btn-secondary mt-3">Retour</button>
-      <button @click="editCustomer" class="btn btn-primary mt-3 ms-2">Modifier</button>
+  <div class="container mt-5 p-4">
+    <h2 class="text-center text-primary mb-4">Détails du Client</h2>
+    <div v-if="customer" class="card shadow p-4">
+      <div class="card-body">
+        <p class="card-text"><strong>Nom :</strong> {{ customer.fullName }}</p>
+        <p class="card-text"><strong>Adresse :</strong> {{ customer.address }}</p>
+        <p class="card-text"><strong>NNI :</strong> {{ customer.nni }}</p>
+        <p class="card-text"><strong>Date de Naissance :</strong> {{ formatDate(customer.birthDate) }}</p>
+        <p class="card-text"><strong>Permis de Conduire :</strong> {{ customer.drivingLicense }}</p>
+        <p class="card-text"><strong>Téléphone :</strong> {{ customer.phoneNumber }}</p>
+      </div>
+      <div class="card-footer d-flex justify-content-end">
+        <button @click="goBack" class="btn btn-secondary me-2">Retour</button>
+        <button @click="editCustomer" class="btn btn-primary">Modifier</button>
+      </div>
     </div>
-    <div v-else>
+    <div v-else class="text-center">
       <p>Chargement des détails du client...</p>
     </div>
   </div>
@@ -43,12 +46,24 @@ const formatDate = (date) => {
 };
 
 const goBack = () => router.push({ name: 'CustomerList' });
-const editCustomer = () => router.push({ name: 'EditCustomer', params: { id: route.params.id } });
+const editCustomer = () => router.push({ name: 'CustomerEdit', params: { id: route.params.id } });
 </script>
 
 <style scoped>
 .container {
-  max-width: 800px;
+  max-width: 600px;
   margin: auto;
+}
+.card {
+  border: none;
+  background-color: #f8f9fa;
+}
+.card-body p {
+  font-size: 1.1rem;
+  margin: 0.5rem 0;
+}
+.card-footer {
+  background: transparent;
+  border-top: none;
 }
 </style>

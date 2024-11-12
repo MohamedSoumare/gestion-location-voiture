@@ -1,7 +1,6 @@
-<!-- src/components/customers/EditCustomer.vue -->
 <template>
-  <div class="container mt-5">
-    <h2>Modifier un Client</h2>
+  <div class="container mt-5 p-4 border rounded bg-light shadow">
+    <h2 class="text-center text-primary mb-4">Modifier un Client</h2>
     <form @submit.prevent="saveCustomer" class="mt-4">
       <div class="mb-3">
         <label class="form-label">Nom</label>
@@ -27,14 +26,17 @@
         <label class="form-label">Téléphone</label>
         <input v-model="customer.phoneNumber" type="text" class="form-control" required />
       </div>
-      <button type="submit" class="btn btn-success"> Enregistrer</button>
-      <button @click.prevent="goBack" class="btn btn-secondary ms-2">Annuler</button>
+      <div class="d-flex justify-content-center mt-4">
+        <button type="submit" class="btn btn-success me-2">Enregistrer</button>
+        <button @click.prevent="goBack" class="btn btn-secondary">Annuler</button>
+      </div>
     </form>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import Swal from 'sweetalert2';
 import { useCustomerStore } from '../../store/customerStore';
 import { useRouter, useRoute } from 'vue-router';
 
@@ -54,7 +56,6 @@ const customer = ref({
 onMounted(async () => {
   const customerId = route.params.id;
   if (customerId) {
-    // Charger le client existant si on est en mode édition
     const existingCustomer = await customerStore.getCustomerById(customerId);
     if (existingCustomer) {
       customer.value = { ...existingCustomer };
@@ -66,15 +67,16 @@ const saveCustomer = async () => {
   try {
     const customerId = route.params.id;
     if (customerId) {
-      // Si l'ID existe, mettre à jour le client
       await customerStore.updateCustomer(customerId, customer.value);
+      Swal.fire('Succès', 'Client mis à jour avec succès!', 'success');
     } else {
-      // Sinon, ajouter un nouveau client
       await customerStore.addCustomer(customer.value);
+      Swal.fire('Succès', 'Client ajouté avec succès!', 'success');
     }
     router.push({ name: 'CustomerList' });
   } catch (error) {
-    console.error('Erreur lors de l\'enregistrement du client', error);
+    console.error("Erreur lors de l'enregistrement du client", error);
+    Swal.fire('Erreur', 'Une erreur est survenue lors de l\'enregistrement.', 'error');
   }
 };
 
@@ -83,7 +85,14 @@ const goBack = () => router.push({ name: 'CustomerList' });
 
 <style scoped>
 .container {
-  max-width: 1000px;
+  max-width: 600px;
   margin: auto;
+  background-color: #f8f9fa;
+}
+.form-label {
+  font-weight: bold;
+}
+button {
+  width: 120px;
 }
 </style>

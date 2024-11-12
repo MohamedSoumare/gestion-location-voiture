@@ -168,7 +168,10 @@ const handleAddReservation = async () => {
         </select>
       </div>
 
-      <button type="submit" class="btn btn-primary">Ajouter</button>
+
+      <div class="d-flex justify-content-center mt-4">
+        <button type="submit" class="btn btn-primary">Ajouter</button>
+      <button @click.prevent="goBack" class="btn btn-secondary">Annuler</button></div>
     </form>
   </div>
 </template>
@@ -219,11 +222,16 @@ const handleAddReservation = async () => {
    
   }
 };
+
+const goBack = () => router.push({ name: 'ListReservation' });
 </script>
 
 <style scoped>
 .container {
   max-width: 600px;
   margin-top: 5%;
+}
+button {
+  margin: 10px;
 }
 </style>

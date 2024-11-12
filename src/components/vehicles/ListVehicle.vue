@@ -121,7 +121,9 @@ export default {
   max-width: 900px;
   margin-top: 5%;
 }
-
+.search-input{
+  max-width: 500px;
+}
 .table {
   margin-top: 20px;
 }
