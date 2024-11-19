@@ -40,10 +40,9 @@
       <div class="mb-3">
         <label for="status" class="form-label">Statut</label>
         <select v-model="reservation.status" class="form-select" required>
-          <option value="waitting">En attente</option>
-          <option value="cancelled">Annulée</option>
-          <option value="confirmed">Confirmée</option>
-          <option value="ongoing">En cours</option>
+          <option value="EN_ATTENTE">En attente</option>
+          <option value="ANNULER">Annulée</option>
+          <option value="CONFIRMER">Confirmée</option>
         </select>
       </div>
       <div class="d-flex justify-content-center mt-4">
@@ -77,25 +76,30 @@ const reservation = ref({
   status: ''
 });
 
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  return date.toISOString().split('T')[0]; // Format YYYY-MM-DD
+};
+
 onMounted(async () => {
   try {
-    // Récupère les clients et les véhicules
     await customerStore.fetchCustomers();
     await vehicleStore.fetchVehicles();
     customers.value = customerStore.customers;
     vehicles.value = vehicleStore.vehicles;
 
-    // Récupère les informations de la réservation à modifier
     const reservationId = route.params.id;
     await reservationStore.getReservationById(reservationId);
+    console.log("Réservation existante :", reservationStore.reservation);
+
     const existingReservation = reservationStore.reservation;
 
-    // Remplir le formulaire avec les données existantes
     reservation.value = {
       customer_id: existingReservation.customer_id,
       vehicle_id: existingReservation.vehicle_id,
-      startDate: existingReservation.startDate,
-      endDate: existingReservation.endDate,
+      startDate: formatDate(existingReservation.startDate),
+      endDate: formatDate(existingReservation.endDate),
       totalAmount: existingReservation.totalAmount,
       status: existingReservation.status
     };
@@ -106,7 +110,7 @@ onMounted(async () => {
 
 const handleEditReservation = async () => {
   if (new Date(reservation.value.endDate) < new Date(reservation.value.startDate)) {
-    alert("La date de fin doit être superiéur à la date de début.");
+    alert("La date de fin doit être supérieure à la date de début.");
     return;
   }
 
@@ -117,7 +121,7 @@ const handleEditReservation = async () => {
       startDate: reservation.value.startDate,
       endDate: reservation.value.endDate,
       totalAmount: reservation.value.totalAmount,
-      status: reservation.value.status
+      status: reservation.value.status || "EN_ATTENTE"
     };
 
     const reservationId = route.params.id;

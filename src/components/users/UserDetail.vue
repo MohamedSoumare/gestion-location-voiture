@@ -3,14 +3,13 @@
     <div class="card p-4 shadow-sm">
       <h3 class="card-title text-center mb-4">Détails de l'utilisateur</h3>
       <div class="card-body">
-        <p><strong>Nom Complet:</strong> {{ user.fullName }}</p>
-        <p><strong>Email:</strong> {{ user.email }}</p>
-        <p><strong>Téléphone:</strong> {{ user.phoneNumber }}</p>
-        <p><strong>Rôle:</strong> {{ user.role }}</p>
+        <p><strong>Nom Complet:</strong>       {{ user.fullName }}</p>
+        <p><strong>Email:</strong>       {{ user.email }}</p>
+        <p><strong>Téléphone:</strong>       {{ user.phoneNumber }}</p>
+        <p><strong>Rôle:</strong>       {{ user.role }}</p>
         <p>
-          <strong>Statut:</strong>
-          <span :class="{'text-success': user.status, 'text-danger': !user.status}">
-            {{ user.status ? 'Actif' : 'Inactif' }}
+          <strong>Statut:</strong>       <span :class="{'text-success': user.status, 'text-danger': !user.status}">
+             {{ user.status ? 'Actif' : 'Inactif' }}
           </span>
         </p>
       </div>

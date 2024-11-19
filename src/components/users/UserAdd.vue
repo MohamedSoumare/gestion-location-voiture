@@ -1,6 +1,12 @@
 <template>
   <div class="container mt-5">
     <h3 class="text-center mb-5">Ajouter un nouvel utilisateur</h3>
+    
+    <div v-if="errors.length" class="alert alert-danger">
+      <ul>
+        <li v-for="(error, index) in errors" :key="index">{{ error.message }}</li>
+      </ul>
+    </div>
     <form @submit.prevent="onSubmit" class="form-card">
       <div class="mb-3">
         <label>Nom Complet:</label>
@@ -22,8 +28,8 @@
         <label>Rôle:</label>
         <select v-model="user.role" required class="form-select">
           <option value="">Sélectionner le rôle</option>
-          <option value="admin">Admin</option>
-          <option value="employe">Employé</option>
+          <option value="ADMIN">Admin</option>
+          <option value="EMPLOYE">Employé</option>
         </select>
       </div>
       <div class="mb-3 form-check">
@@ -31,8 +37,8 @@
         <label class="form-check-label">Active</label>
       </div>
       <div class="d-flex justify-content-between">
-        <router-link :to="{ name: 'UserList' }" class="btn btn-secondary">Annuler</router-link>
         <button type="submit" class="btn btn-success">Ajouter</button>
+        <router-link :to="{ name: 'UserList' }" class="btn btn-secondary">Annuler</router-link>
       </div>
     </form>
   </div>
@@ -54,14 +60,19 @@ const user = ref({
 
 const router = useRouter();
 const store = useUserStore();
-
+const errors = ref([]); 
 const onSubmit = async () => {
   try {
+    errors.value = []; 
     await store.addUser(user.value);
     router.push({ name: 'UserList' });
-  } catch (error) {
-    alert("Erreur lors de l'ajout de l'utilisateur.");
-    console.error("Erreur lors de l'ajout de l'utilisateur:", error);
+  }  catch (error) {
+    // Ajouter les erreurs de validation
+    if (error.response?.data?.errors) {
+      errors.value = error.response.data.errors;
+    } else {
+      errors.value = [{ message: 'Erreur inconnue, veuillez réessayer.' }];
+    }
   }
 };
 </script>

@@ -1,6 +1,11 @@
 <template>
   <div class="container mt-5 p-4 border rounded bg-light shadow">
     <h2 class="text-center text-primary mb-4">Ajouter un Client</h2>
+    <div v-if="errors && errors.length" class="alert alert-danger">
+      <ul>
+        <li v-for="(error, index) in errors" :key="index">{{ error }}</li>
+      </ul>
+    </div>
     <form @submit.prevent="saveCustomer" class="mt-4">
       <!-- Formulaire pour ajouter un client -->
       <div class="mb-3">
@@ -36,13 +41,14 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import Swal from 'sweetalert2';
 import { useCustomerStore } from '../../store/customerStore';
 import { useRouter } from 'vue-router';
 
 const store = useCustomerStore();
 const router = useRouter();
+
 
 const customer = ref({
   fullName: '',
@@ -53,8 +59,12 @@ const customer = ref({
   phoneNumber: '',
 });
 
+// Errors sont récupérées dynamiquement depuis le store
+const errors = ref([])
+
 const saveCustomer = async () => {
   try {
+    errors.value = []; 
     await store.addCustomer(customer.value);
     Swal.fire('Succès', 'Client ajouté avec succès!', 'success');
     router.push({ name: 'CustomerList' });

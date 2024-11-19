@@ -8,20 +8,41 @@
         </button>
       </div>
 
+
+
       <div class="header-right">
+        <select
+          id="language"
+          class="form-select border-0 m-lg-4"
+          @change="changeLanguage"
+          aria-label="Language selection"
+        >
+          <option value="en">EN</option>
+          <option value="fr">FR</option>
+          <option value="ar">AR</option>
+        </select>
+        <div class="user-info d-flex align-items-center">
+          <img
+            v-if="user?.profileImage"
+            :src="user.profileImage"
+            class="rounded-circle me-2 dropdown-toggle"
+            alt="User Profile"
+            width="50"
+          />
+          <span class="fw-bold user-name">{{ user?.fullName || 'Invité' }}</span>
+          <button class="btn btn-outline-secondary ms-5 d-flex align-items-center mr-5" @click="logout">
+            <i class="fas fa-sign-out-alt me-3"> </i>
+            Déconnexion
+          </button>
+  
+        </div>   
+      
         <!-- <div class="notification">
           <i class="fas fa-bell"></i>
           <span class="badge">{{ notifications }}</span>
         </div> -->
-        <div class="user">
-          <i class="fas fa-user"></i>
-          <span class="badge">Utilisateur</span>
-        </div> 
-        <button class="btn btn-outline-secondary" @click="toggleAuth">
-          <i class="fas" :class="isAuthenticated ? 'fa-sign-out-alt' : 'fa-sign-in-alt'"></i>
-          <span class="ms-2">{{ isAuthenticated ? "Déconnexion" : "Connexion" }}</span>
-        </button>
       </div>
+      
     </header>
 
     <!-- Sidebar -->
@@ -31,6 +52,10 @@
         <h4>Gestion de Location</h4>
       </div>
       <ul class="list-unstyled">
+        <router-link to="/home" class="nav-link">
+            <i class="fas fa-home"></i>
+            <span>Acceuil</span>
+          </router-link>
         <li>
           <router-link to="/customer-list" class="nav-link">
             <i class="fas fa-users"></i>
@@ -63,39 +88,45 @@
           </router-link>
         </li>
         <li>
-          <router-link to="/login" class="nav-link">
-            <i class="fas fa-lock"></i>
-            <span>Login</span>
-          </router-link>
+        
         </li>
       </ul>
     </nav>
 
     <main class="content">
-      <router-view></router-view>
+      <RouterView />
     </main>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import { useAuthStore } from '../store/authStore';
+import { useRouter } from 'vue-router';
 
-const isLightGreyMode = ref(true); 
+const isLightGreyMode = ref(true);
 const isSidebarCollapsed = ref(false);
-const isAuthenticated = ref(false);
-const notifications = ref(5);
+const authStore = useAuthStore();
+const router = useRouter();
 
-// function toggleSidebar() {
-//   isSidebarCollapsed.value = !isSidebarCollapsed.value;
-// }
+// Récupération des informations de l'utilisateur connecté
+const user = computed(() => authStore.user);
 
-function toggleAuth() {
-  isAuthenticated.value = !isAuthenticated.value;
-  if (isAuthenticated.value) {
-    console.log("Utilisateur connecté");
-  } else {
-    console.log("Utilisateur déconnecté");
-  }
+// Fonction de déconnexion
+function logout() {
+  authStore.logout();
+  router.push({ name: 'login' });
+}
+
+// Fonction pour changer la langue
+function changeLanguage(event) {
+  const selectedLanguage = event.target.value;
+  console.log(`Language changed to: ${selectedLanguage}`);
+}
+
+// Fonction pour basculer la barre latérale
+function toggleSidebar() {
+  isSidebarCollapsed.value = !isSidebarCollapsed.value;
 }
 </script>
 

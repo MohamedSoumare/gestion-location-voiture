@@ -56,6 +56,18 @@ export const useContractStore = defineStore('contract', {
         this.error = "Erreur lors de la mise à jour du contrat";
       }
     },
+    async updateContractStatus(id, status) {
+      try {
+        
+        await this.updateContract(id, { status });
+      } catch (error) {
+        this.error = "Erreur lors de la mise à jour du statut de la contrat.";
+        console.error(this.error, error);
+        // Vous pouvez personnaliser davantage la gestion des erreurs ici si nécessaire
+        throw error;
+      }
+    },
+   
 
     // Obtenir les détails d'un contrat par ID
     async getContractById(id) {

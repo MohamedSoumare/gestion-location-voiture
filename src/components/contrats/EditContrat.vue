@@ -33,9 +33,9 @@
       <div class="mb-3">
         <label for="status" class="form-label">Statut</label>
         <select v-model="contract.status" class="form-control" required>
-          <option value="waitting">En attend</option>
-          <option value="cancelled">Annuller</option>
-          <option value="validate">Valider</option>
+          <option value="EN_ATTENTE">En attend</option>
+          <option value="ANNULER">Annuller</option>
+          <option value="VALIDER">Valider</option>
         </select>
       </div>
       <button type="submit" class="btn btn-primary">Enregistrer</button>

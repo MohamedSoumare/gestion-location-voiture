@@ -161,10 +161,9 @@ const handleAddReservation = async () => {
       <div class="mb-3">
         <label for="status" class="form-label">Statut</label>
         <select v-model="reservation.status" class="form-control" required>
-          <option value="reserved">Réservé</option>
-          <option value="cancelled">Annulé</option>
-          <option value="maintenance">Maintenance</option>
-          <option value="waiting">En cours</option>
+          <option value="EN_ATTENTE">En attente</option>
+          <option value="ANNULER">Annulée</option>
+          <option value="CONFIRMER">Confirmée</option>
         </select>
       </div>
 

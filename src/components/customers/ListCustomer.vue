@@ -8,7 +8,6 @@
 
     <input type="text" class="form-control search-input" placeholder="Rechercher un client" v-model="searchQuery" @input="searchCustomers" />
     
-
     <div v-if="loading">Chargement...</div>
     <div v-if="error" class="alert alert-danger">{{ error }}</div>
 
@@ -59,14 +58,16 @@ const error = ref(null);
 
 const fetchCustomers = async () => {
   loading.value = true;
-  await customerStore.fetchCustomers();
-  customers.value = customerStore.customers;
-  filteredCustomers.value = customers.value;
-  loading.value = false;
+  try {
+    await customerStore.fetchCustomers();
+    customers.value = customerStore.customers;
+    filteredCustomers.value = customers.value;
+  } catch (err) {
+    error.value = "Erreur lors de la récupération des clients.";
+  } finally {
+    loading.value = false;
+  }
 };
-
-onMounted(fetchCustomers);
-
 const searchCustomers = () => {
   filteredCustomers.value = customers.value.filter(customer =>
     customer.fullName.toLowerCase().includes(searchQuery.value.toLowerCase())
@@ -78,32 +79,34 @@ const editCustomer = (id) => router.push({ name: 'CustomerEdit', params: { id } 
 
 const confirmDeleteCustomer = (id) => {
   Swal.fire({
-    title: 'Êtes-vous sûr ?',
-    text: "Cette action est irréversible !",
-    icon: 'warning',
+    title: "Êtes-vous sûr ?",
+    text: "Cette action est irréversible.",
+    icon: "warning",
     showCancelButton: true,
-    confirmButtonColor: '#3085d6',
-    cancelButtonColor: '#d33',
-    confirmButtonText: 'Oui, supprimer',
-    cancelButtonText: 'Annuler',
+    confirmButtonText: "Oui, supprimer",
+    cancelButtonText: "Annuler",
   }).then(async (result) => {
     if (result.isConfirmed) {
-     
       await customerStore.deleteCustomer(id);
       fetchCustomers();
     }
   });
 };
-
-const goToAddCustomer = () => router.push({ name: 'CustomerEdit' });
+const goToAddCustomer = () => router.push({ name: 'CustomerAdd' });
+onMounted(fetchCustomers);
 </script>
 
 <style scoped>
 .container {
-  max-width: 1000px;
+  max-width: 1200px;
   margin: auto;
 }
+table{
+  width: 100%;
+}
+
 .search-input{
   max-width: 450px;
 }
 </style>
+   

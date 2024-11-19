@@ -26,26 +26,32 @@ export const useCustomerStore = defineStore('customer', {
       try {
         const response = await axiosInstance.post('/customers/add', newCustomer);
         this.customers.push(response.data);
-        await this.fetchCustomers(); // Recharge les clients après ajout
+        await this.fetchCustomers();
+        this.error = null; // Réinitialiser les erreurs en cas de succès
       } catch (error) {
-        console.error("Erreur lors de l'ajout du client:", error);
-        this.error = "Erreur lors de l'ajout du client";
+        // if (error.response && error.response.data && error.response.data.errors) {
+        //   // Si des erreurs de validation sont renvoyées
+        //   this.error = error.response.data.errors;
+        // } else {
+        //   this.error = "Erreur lors de l'ajout du client";
+        // }
+        throw error;
       }
     },
-
     async updateCustomer(id, updatedCustomer) {
       try {
-        await axiosInstance.put(`/customers/update/${id}`, updatedCustomer);
-        const index = this.customers.findIndex((customer) => customer.id === id);
+        const response = await axiosInstance.put(`/customers/update/${id}`, updatedCustomer);
+        const index = this.customers.findIndex(customer => customer.id === id);
         if (index !== -1) {
-          this.customers[index] = { ...this.customers[index], ...updatedCustomer };
+          this.customers[index] = { ...this.customers[index], ...response.data };
         }
         await this.fetchCustomers();
-      } catch (error) {
-        this.error = 'Erreur lors de la mise à jour du client';
+      } catch (err) {
+        console.error('Failed to update customer:', err);
+        throw err;
       }
     },
-
+  
     async getCustomerById(id) {
       try {
         const response = await axiosInstance.get(`/customers/${id}`);

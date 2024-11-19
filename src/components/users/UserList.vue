@@ -45,7 +45,7 @@
         
         </tr>
       </tbody>
-    </table>
+    </table>  
   </div>
 </template>
 
