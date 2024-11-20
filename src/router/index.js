@@ -88,6 +88,7 @@
 // export default router;
 
 import { createRouter, createWebHistory } from 'vue-router';
+import { useAuthStore } from '../store/authStore';
 import Login from '../components/authentificate/Login.vue';
 import Dashboard from '../components/Dashboard.vue';
 import UserList from '../components/users/UserList.vue';
@@ -110,7 +111,7 @@ import AddReservation from '../components/reservations/AddReservation.vue';
 import EditReservation from '../components/reservations/EditReservation.vue';
 import DetailsReservation from '../components/reservations/DetailsReservation.vue';
 import EditCustomer from '../components/customers/EditCustomer.vue';
-
+import Home from '../components/Home.vue';
 
 
 const routes = [
@@ -120,7 +121,7 @@ const routes = [
     name: 'dashboard',
     component: Dashboard,
     children: [
-    
+      { path: '/home', name: 'Home', component: Home },
       { path: '/users', name: 'UserList', component: UserList },
       { path: '/users/add', name: 'AddUser', component: UserAdd },
       { path: '/users/:id/edit', name: 'EditUser', component: UserEdit, props: true },
@@ -185,5 +186,14 @@ const router = createRouter({
   history: createWebHistory(),
   routes,
 });
+router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore();
+  if (to.name !== 'login' && !authStore.isAuthenticated) {
+    next({ name: 'login' }); // Redirige vers la page de connexion si non authentifié
+  } else {
+    next(); // Continue vers la route demandée
+  }
+});
+
 
 export default router;

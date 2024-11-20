@@ -1,8 +1,8 @@
 <template>
   <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h2 class="mb-4">Liste des Réservations</h2>
-      <button class="btn btn-primary mb-3" @click="addReservation">
+      <h2 class="mb-5 ">Liste des Réservations</h2>
+      <button class="btn btn-primary mt-5" @click="addReservation">
         <i class="fas fa-plus"></i> Ajouter une Réservation
       </button>
     </div>
@@ -39,21 +39,21 @@
           <td>{{ reservation.totalAmount }} MRU</td>
           <td>
             <select
-  v-model="reservation.status"
-  :disabled="new Date(reservation.endDate) < new Date()"
-  @change="updateStatus(reservation.id, reservation.status)"
-  :style="{
-    color: reservation.status === 'CONFIRMER' ? '#008000' :
-           reservation.status === 'ANNULLER' ? '#ff0000' : ''
-  }"
-  class="form-select bg-opacity-50"
->
-  <option value="CONFIRMER">Confirmé</option>
-  <option value="EN_ATTENTE">En attente</option>
-  <option value="ANNULLER">Annulé</option>
-</select>
+          v-model="reservation.status"
+          :disabled="new Date(reservation.endDate) < new Date()"
+          @change="updateStatus(reservation.id, reservation.status)"
+          :style="{
+            color: reservation.status === 'CONFIRMER' ? '#008000' :
+                  reservation.status === 'ANNULLER' ? '#ff0000' : ''
+          }"
+          class="form-select bg-opacity-50"
+        >
+          <option value="CONFIRMER">Confirmé</option>
+          <option value="EN_ATTENTE">En attente</option>
+          <option value="ANNULLER">Annulé</option>
+        </select>
 
-</td>
+      </td>
           <td>
             <button class="btn btn-outline-info me-3" @click="viewDetails(reservation.id)">
               <i class="fas fa-eye"></i>
@@ -115,7 +115,7 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useReservationStore } from '../../store/reservationStore';
-import Swal from 'sweetalert2';
+import Swal from 'sweetalert2'; 
 
 const router = useRouter();
 const reservationStore = useReservationStore();
@@ -155,10 +155,12 @@ watch(filteredReservations, () => {
   }
 });
 
-const formatDate = date => {
-  const options = { year: 'numeric', month: 'short', day: 'numeric' };
-  return new Date(date).toLocaleDateString('fr-FR', options);
-};
+// const formatDate = date => {
+//   const options = { year: 'numeric', month: 'short', day: 'numeric' };
+//   return new Date(date).toLocaleDateString('fr-FR', options);
+// };
+
+const formatDate = date => new Date(date).toLocaleDateString('fr-FR');
 
 const addReservation = () => router.push({ name: 'AddReservation' });
 const viewDetails = id => router.push({ name: 'DetailsReservation', params: { id } });
@@ -192,7 +194,7 @@ const updateStatus = async (id, status) => {
 
 <style scoped>
 .container {
-  max-width: 1000px;
+  max-width: 1200px;
   margin: auto;
 }
 .search-input {

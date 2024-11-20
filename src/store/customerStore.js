@@ -27,17 +27,19 @@ export const useCustomerStore = defineStore('customer', {
         const response = await axiosInstance.post('/customers/add', newCustomer);
         this.customers.push(response.data);
         await this.fetchCustomers();
-        this.error = null; // Réinitialiser les erreurs en cas de succès
+        this.error = null;
       } catch (error) {
-        // if (error.response && error.response.data && error.response.data.errors) {
-        //   // Si des erreurs de validation sont renvoyées
-        //   this.error = error.response.data.errors;
-        // } else {
-        //   this.error = "Erreur lors de l'ajout du client";
-        // }
+        if (error.response && error.response.data.errors) {
+          // Récupérer les erreurs détaillées
+          this.error = error.response.data.errors.map((e) => e.message || e);
+        } else {
+          this.error = ['Une erreur est survenue lors de l’ajout du client.'];
+        }
         throw error;
       }
     },
+    
+       
     async updateCustomer(id, updatedCustomer) {
       try {
         const response = await axiosInstance.put(`/customers/update/${id}`, updatedCustomer);

@@ -16,7 +16,7 @@ export const useUserStore = defineStore('user', {
         const response = await axiosInstance.get('/users');
         this.users = response.data;
       } catch (error) {
-        // this.error = error.response?.data?.message || 'Erreur lors du chargement des utilisateurs';
+        this.error = error.response?.data?.message || 'Erreur lors du chargement des utilisateurs';
         throw error;
       } finally {
         this.loading = false;
@@ -28,7 +28,7 @@ export const useUserStore = defineStore('user', {
         await axiosInstance.post('/users/add', userData);
         await this.fetchUsers();
       } catch (error) {
-        // this.error = error.response?.data?.message || 'Erreur lors de l\'ajout de l\'utilisateur';
+        this.error = error.response?.data?.message || 'Erreur lors de l\'ajout de l\'utilisateur';
         throw error;
       }
     },
@@ -41,7 +41,7 @@ export const useUserStore = defineStore('user', {
           this.users[index] = { ...this.users[index], ...user };
         }
       } catch (error) {
-        // this.error = error.response?.data?.message || 'Erreur lors de la mise à jour de l\'utilisateur';
+        this.error = error.response?.data?.message || 'Erreur lors de la mise à jour de l\'utilisateur';
         throw error;
       }
     },

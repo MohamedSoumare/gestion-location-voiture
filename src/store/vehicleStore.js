@@ -8,7 +8,7 @@ export const useVehicleStore = defineStore('vehicle', {
     error: null,
   }),
 
-  actions: {
+actions: {
     async fetchVehicles() {
       this.loading = true;
       try {
@@ -16,7 +16,8 @@ export const useVehicleStore = defineStore('vehicle', {
         this.vehicles = Array.isArray(response.data) ? response.data : [];
       } catch (error) {
         console.error('Erreur lors de la récupération des véhicules', error);
-        this.error = 'Erreur lors de la récupération des véhicules';
+        // this.error = 'Erreur lors de la récupération des véhicules';
+        throw error;
       } finally {
         this.loading = false;
       }
@@ -26,9 +27,15 @@ export const useVehicleStore = defineStore('vehicle', {
       try {
         await axiosInstance.post('/vehicles/add', vehicleData);
         await this.fetchVehicles();
+        this.error = null;
       } catch (error) {
-        console.error("Erreur lors de l'ajout du véhicule", error);
-        this.error = "Erreur lors de l'ajout du véhicule";
+        if (error.response && error.response.data.errors) {
+          // Récupérer les erreurs détaillées
+          this.error = error.response.data.errors.map((e) => e.message || e);
+        } else {
+          this.error = ['Une erreur est survenue lors de l’ajout d\'un véhicule .'];
+        }
+        throw error;
       }
     },
     async getVehicleById(id) {
@@ -46,8 +53,13 @@ export const useVehicleStore = defineStore('vehicle', {
         await axiosInstance.put(`/vehicles/edit/${id}`, updatedData);
         await this.fetchVehicles();
       } catch (error) {
-        console.error("Erreur lors de la mise à jour du véhicule", error);
-        this.error = "Erreur lors de la mise à jour du véhicule";
+        if (error.response && error.response.data.errors) {
+          // Récupérer les erreurs détaillées
+          this.error = error.response.data.errors.map((e) => e.message || e);
+        } else {
+          this.error = ['Une erreur est survenue lors de mise à jour d\'un véhicule .'];
+        }
+        throw error;
       }
     },
 
@@ -57,11 +69,12 @@ export const useVehicleStore = defineStore('vehicle', {
         await axiosInstance.delete(`/vehicles/delete/${id}`);
         this.vehicles = this.vehicles.filter(vehicle => vehicle.id !== id);
       } catch (error) {
-        console.error('Erreur lors de la suppression du véhicule', error);
-        this.error = 'Erreur lors de la suppression du véhicule';
+        console.error('Erreur lors de la suppression du véhicule:', error); // Correction ici
+        throw error;
       } finally {
-        this.loading = false;
+        this.loading = false; // Ajout de cette ligne pour stopper le chargement
       }
     },
+    
   },
 });

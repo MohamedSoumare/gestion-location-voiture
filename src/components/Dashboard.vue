@@ -7,9 +7,6 @@
           <i class="fas fa-bars"></i>
         </button>
       </div>
-
-
-
       <div class="header-right">
         <select
           id="language"
@@ -30,19 +27,16 @@
             width="50"
           />
           <span class="fw-bold user-name">{{ user?.fullName || 'Invité' }}</span>
-          <button class="btn btn-outline-secondary ms-5 d-flex align-items-center mr-5" @click="logout">
+          <button class="btn btn-outline-secondary ms-5 d-flex align-items-center mr-5"  @click="onLogout">
             <i class="fas fa-sign-out-alt me-3"> </i>
             Déconnexion
           </button>
-  
         </div>   
-      
         <!-- <div class="notification">
           <i class="fas fa-bell"></i>
           <span class="badge">{{ notifications }}</span>
         </div> -->
       </div>
-      
     </header>
 
     <!-- Sidebar -->
@@ -113,10 +107,10 @@ const router = useRouter();
 const user = computed(() => authStore.user);
 
 // Fonction de déconnexion
-function logout() {
-  authStore.logout();
-  router.push({ name: 'login' });
-}
+   const onLogout = () => {
+      authStore.logout();
+      router.push({ name: 'login' }); // Redirection vers la page de login après déconnexion
+    };
 
 // Fonction pour changer la langue
 function changeLanguage(event) {

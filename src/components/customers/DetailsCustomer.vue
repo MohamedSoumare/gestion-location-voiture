@@ -10,9 +10,9 @@
         <p class="card-text"><strong>Permis de Conduire :</strong> {{ customer.drivingLicense }}</p>
         <p class="card-text"><strong>Téléphone :</strong> {{ customer.phoneNumber }}</p>
       </div>
-      <div class="card-footer d-flex justify-content-end">
+      <div class="card-footer d-flex justify-content-end mt-4">
+        <!-- <button @click="editCustomer" class="btn btn-primary">Modifier</button> -->
         <button @click="goBack" class="btn btn-secondary me-2">Retour</button>
-        <button @click="editCustomer" class="btn btn-primary">Modifier</button>
       </div>
     </div>
     <div v-else class="text-center">
@@ -46,7 +46,7 @@ const formatDate = (date) => {
 };
 
 const goBack = () => router.push({ name: 'CustomerList' });
-const editCustomer = () => router.push({ name: 'CustomerEdit', params: { id: route.params.id } });
+// const editCustomer = () => router.push({ name: 'CustomerEdit', params: { id: route.params.id } });
 </script>
 
 <style scoped>

@@ -2,11 +2,11 @@
   <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2 class="mb-5">Liste des véhicules</h2>
-      <button @click="goToAdd" class="btn btn-primary mt-5">
+      <button @click="goToAdd" class="btn btn-primary">
         <i class="fas fa-plus"></i> Ajouter un véhicule
       </button>
     </div>
-    <!-- Champ de recherche -->
+    
     <input 
       v-model="searchTerm" 
       class="form-control search-input mb-3"
@@ -118,7 +118,7 @@ export default {
 
 <style scoped>
 .container {
-  max-width: 900px;
+  max-width: 1200px;
   margin-top: 5%;
 }
 .search-input{

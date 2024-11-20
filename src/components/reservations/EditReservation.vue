@@ -1,59 +1,74 @@
 <template>
   <div class="container mt-4">
-    <h2>Modifier la Réservation</h2>
+    <h2 class="mb-5 d-flex justify-content-center">Modifier la Réservation</h2>
+    
+    <div v-if="validationErrors && validationErrors.length" class="alert alert-danger">
+      <ul>
+        <li v-for="(error, index) in validationErrors" :key="index">{{ error }}</li>
+      </ul>
+    </div>
+
     <form @submit.prevent="handleEditReservation">
-      <div class="mb-3">
-        <label for="customer" class="form-label">Client</label>
-        <select v-model="reservation.customer_id" class="form-select" required>
-          <option disabled value="">Sélectionner un Client</option>
-          <option v-for="customer in customers" :key="customer.id" :value="customer.id">
-            {{ customer.fullName }}
-          </option>
-        </select>
+      <div class="row g-4">
+  
+        <div class="col-md-6">
+          <label for="customer" class="form-label">Client</label>
+          <select v-model="reservation.customer_id" class="form-select" required>
+            <option disabled value="">Sélectionner un Client</option>
+            <option v-for="customer in customers" :key="customer.id" :value="customer.id">
+              {{ customer.fullName }}
+            </option>
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label for="vehicle" class="form-label">Véhicule</label>
+          <select v-model="reservation.vehicle_id" class="form-select" required>
+            <option disabled value="">Sélectionner un Véhicule</option>
+            <option v-for="vehicle in vehicles" :key="vehicle.id" :value="vehicle.id">
+              {{ vehicle.brand }} {{ vehicle.model }}
+            </option>
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label for="startDate" class="form-label">Date de début</label>
+          <input type="date" v-model="reservation.startDate" class="form-control" required />
+        </div>
+
+       
+        <div class="col-md-6">
+          <label for="endDate" class="form-label">Date de fin</label>
+          <input type="date" v-model="reservation.endDate" class="form-control" required />
+        </div>
+
+        <!-- Montant Total -->
+        <div class="col-md-6">
+          <label for="totalAmount" class="form-label">Montant Total</label>
+          <input type="number" v-model="reservation.totalAmount" class="form-control" required />
+        </div>
+
+        <!-- Statut -->
+        <div class="col-md-6">
+          <label for="status" class="form-label">Statut</label>
+          <select v-model="reservation.status" class="form-select" required>
+            <option value="EN_ATTENTE">En attente</option>
+            <option value="ANNULER">Annulée</option>
+            <option value="CONFIRMER">Confirmée</option>
+          </select>
+        </div>
       </div>
 
-      <div class="mb-3">
-        <label for="vehicle" class="form-label">Véhicule</label>
-        <select v-model="reservation.vehicle_id" class="form-select" required>
-          <option disabled value="">Sélectionner un Véhicule</option>
-          <option v-for="vehicle in vehicles" :key="vehicle.id" :value="vehicle.id">
-            {{ vehicle.brand }} {{ vehicle.model }}
-          </option>
-        </select>
+      <div class="d-flex justify-content-between mt-4">
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+        <button @click.prevent="goBack" class="btn btn-secondary">Annuler</button>
       </div>
-
-      <div class="mb-3">
-        <label for="startDate" class="form-label">Date de début</label>
-        <input type="date" v-model="reservation.startDate" class="form-control" required />
-      </div>
-
-      <div class="mb-3">
-        <label for="endDate" class="form-label">Date de fin</label>
-        <input type="date" v-model="reservation.endDate" class="form-control" required />
-      </div>
-
-      <div class="mb-3">
-        <label for="totalAmount" class="form-label">Montant Total</label>
-        <input type="number" v-model="reservation.totalAmount" class="form-control" required />
-      </div>
-
-      <div class="mb-3">
-        <label for="status" class="form-label">Statut</label>
-        <select v-model="reservation.status" class="form-select" required>
-          <option value="EN_ATTENTE">En attente</option>
-          <option value="ANNULER">Annulée</option>
-          <option value="CONFIRMER">Confirmée</option>
-        </select>
-      </div>
-      <div class="d-flex justify-content-center mt-4">
-      <button type="submit" class="btn btn-primary">Enregistrer</button>
-      <button @click.prevent="goBack" class="btn btn-secondary">Annuler</button></div>
     </form>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useReservationStore } from '../../store/reservationStore';
 import { useVehicleStore } from '../../store/vehicleStore';
@@ -76,6 +91,7 @@ const reservation = ref({
   status: ''
 });
 
+const validationErrors = ref([]);
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -91,7 +107,6 @@ onMounted(async () => {
 
     const reservationId = route.params.id;
     await reservationStore.getReservationById(reservationId);
-    console.log("Réservation existante :", reservationStore.reservation);
 
     const existingReservation = reservationStore.reservation;
 
@@ -109,9 +124,23 @@ onMounted(async () => {
 });
 
 const handleEditReservation = async () => {
-  if (new Date(reservation.value.endDate) < new Date(reservation.value.startDate)) {
-    alert("La date de fin doit être supérieure à la date de début.");
-    return;
+  validationErrors.value = [];
+  const today = new Date();
+  const startDate = new Date(reservation.value.startDate);
+  const endDate = new Date(reservation.value.endDate);
+
+  if (startDate < today) {
+    validationErrors.value.push("La réservation ne peut pas commencer dans une période (date) passée.");
+  }
+  if (startDate.getTime() === endDate.getTime()) {
+    validationErrors.value.push("La date de retour ne peut pas être identique à la date de départ.");
+  }
+  if (endDate < startDate) {
+    validationErrors.value.push("La date de fin doit être supérieure à la date de début.");
+  }
+
+  if (validationErrors.value.length > 0) {
+    return; // Stop if validation errors exist
   }
 
   try {
@@ -121,7 +150,7 @@ const handleEditReservation = async () => {
       startDate: reservation.value.startDate,
       endDate: reservation.value.endDate,
       totalAmount: reservation.value.totalAmount,
-      status: reservation.value.status || "EN_ATTENTE"
+      status: reservation.value.status || "EN_ATTENTE",
     };
 
     const reservationId = route.params.id;
@@ -133,13 +162,12 @@ const handleEditReservation = async () => {
 };
 const goBack = () => router.push({ name: 'ListReservation' });
 </script>
-
 <style scoped>
 .container {
   max-width: 800px;
   margin-top: 5%;
 }
 button {
- margin: 10px;
+  margin: 10px;
 }
 </style>

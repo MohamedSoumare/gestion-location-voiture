@@ -37,7 +37,7 @@
         <label class="form-check-label">Active</label>
       </div>
       <div class="d-flex justify-content-between">
-        <button type="submit" class="btn btn-success">Ajouter</button>
+        <button type="submit" class="btn btn-success">Enregistrer</button>
         <router-link :to="{ name: 'UserList' }" class="btn btn-secondary">Annuler</router-link>
       </div>
     </form>

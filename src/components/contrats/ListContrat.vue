@@ -1,8 +1,8 @@
 <template>
   <div class="container my-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h2>Liste des Contrats</h2>
-      <button @click="addContract" class="btn btn-primary">
+      <h2 class="mb-5">Liste des Contrats</h2>
+      <button @click="addContract" class="btn btn-primary mt-5">
         <i class="fas fa-plus"></i> Ajouter un contrat
       </button>
     </div>
@@ -193,7 +193,7 @@ const previousPage = () => {
   text-align: center;
 }
 .container {
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 .pagination {

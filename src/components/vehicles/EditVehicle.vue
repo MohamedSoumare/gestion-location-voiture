@@ -1,6 +1,17 @@
 <template>
   <div class="container">
     <h2>Modifier le véhicule</h2>
+  <div v-if="storeError && storeError.length" class="alert alert-danger">
+  <ul>
+    <li v-for="(error, index) in storeError" :key="index">
+      {{ error }}
+    </li>
+  </ul>
+</div>
+<div v-if="!storeError && successMessage" class="alert alert-success">
+  {{ successMessage }}
+</div>
+
     <form @submit.prevent="submitForm" class="form-layout">
       <div class="form-group">
         <label for="brand">Marque</label>
@@ -74,11 +85,13 @@
         <button type="button" @click="goBack" class="btn btn-secondary flex-end">Retour</button>
       </div>
     </form>
-  </div>
+      
+      </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
+
 import { useVehicleStore } from '../../store/vehicleStore';
 import { useRouter, useRoute } from 'vue-router';
 
@@ -100,6 +113,8 @@ const vehicle = ref({
   dailyRate: 0.0
 });
 
+const storeError = computed(() => vehicleStore.error);
+
 onMounted(async () => {
   try {
     const vehicleId = route.params.id;
@@ -110,9 +125,16 @@ onMounted(async () => {
   }
 });
 
+const successMessage = ref('');
+
 const submitForm = async () => {
+  // if (!isValidVehicle(vehicle.value)) {
+  //   console.error("Le formulaire contient des champs invalides.");
+  //   return;
+  // }
   try {
     await vehicleStore.updateVehicle(route.params.id, vehicle.value);
+    successMessage.value = 'Véhicule mis à jour avec succès.';
     router.push({ name: 'ListVehicle' });
   } catch (error) {
     console.error("Erreur lors de la mise à jour du véhicule :", error);
@@ -205,4 +227,28 @@ h2 {
 .btn-secondary:hover {
   background-color: #5a6268;
 }
+
+.btn:focus {
+  outline: 2px solid #0056b3;
+  outline-offset: 2px;
+}
+.alert {
+  padding: 15px;
+  margin-top: 20px;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.alert-danger {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.alert-success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
 </style>

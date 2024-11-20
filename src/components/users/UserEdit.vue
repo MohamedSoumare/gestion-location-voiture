@@ -34,7 +34,7 @@
         <label class="form-check-label">Active</label>
       </div>
 
-      <div class="d-flex justify-content-between">
+      <div class="d-flex justify-content-between mt-4">
         <button type="submit" class="btn btn-primary">Enregistrer</button>
         <button type="button" class="btn btn-secondary" @click="cancel">Annuler</button>
       </div>

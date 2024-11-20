@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import axiosInstance from '../components/axios/configAxios';
 import { getAuthToken } from '../utils/token';
+import Swal from 'sweetalert2';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -37,8 +38,15 @@ export const useAuthStore = defineStore('auth', {
       this.token = null;
       localStorage.removeItem('authToken');
       localStorage.removeItem('refreshToken');
-      Swal.fire('Déconnexion', 'Vous avez été déconnecté avec succès.', 'success');
+      
+      Swal.fire({
+        title: 'Déconnexion',
+        text: 'Vous avez été déconnecté avec succès.',
+        icon: 'success',
+        confirmButtonText: 'OK'
+      });
     },
+    
     
 
     checkAuth() {

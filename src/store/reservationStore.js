@@ -1,106 +1,115 @@
-// reservationStore.js
 import { defineStore } from 'pinia';
 import axiosInstance from '../components/axios/configAxios';
 import Swal from 'sweetalert2';
 
+
 export const useReservationStore = defineStore('reservation', {
-  state: () => ({  
-    reservations: [],
+  state: () => ({
+    reservations: [], 
     reservation: null,
-    customers: [],
-    vehicles: [],
-    loading: false,
-    error: null,
+    loading: false, 
+    error: null, 
+    validationErrors: [], 
   }),
 
   actions: {
+    // Récupérer toutes les réservations
     async fetchReservations() {
       this.loading = true;
+      this.error = null;
       try {
         const response = await axiosInstance.get('/reservations');
         this.reservations = response.data;
-        console.log('Réservations récupérées avec succès :', response.data);
       } catch (error) {
-        console.error('Erreur lors de la récupération des réservations :', error.response || error.message);
-        this.error = 'Erreur lors de la récupération des réservations';
+        this.error = error.response?.data?.message || 'Erreur lors de la récupération des réservations.';
         Swal.fire('Erreur', this.error, 'error');
       } finally {
         this.loading = false;
       }
     },
-        
+
+    // Récupérer une réservation par ID
     async getReservationById(id) {
+      this.loading = true;
+      this.error = null;
       try {
         const response = await axiosInstance.get(`/reservations/${id}`);
-        this.reservation = response.data; 
+        this.reservation = response.data;
       } catch (error) {
-        console.error('Erreur lors du chargement de la réservation :', error.response || error.message);
-    throw new Error('Impossible de charger la réservation. Veuillez vérifier l’ID et réessayer.');
+        this.error = error.response?.data?.message || 'Erreur lors de la récupération de la réservation.';
+        throw error;
+      } finally {
+        this.loading = false;
       }
     },
 
+    // Ajouter une nouvelle réservation
     async addReservation(newReservation) {
+      this.loading = true;
+      this.validationErrors = [];
+      this.error = null;
       try {
         const response = await axiosInstance.post('/reservations/add', newReservation);
         this.reservations.push(response.data);
-        await this.fetchReservations();
+        Swal.fire('Succès', 'Réservation ajoutée avec succès.', 'success');
       } catch (error) {
-        const errorMessage = error.response?.data?.message || 'Erreur lors de l\'ajout de la réservation';
-        console.error("Erreur lors de l'ajout de la réservation :", errorMessage);
-        Swal.fire('Erreur', errorMessage, 'error');
-        throw new Error(errorMessage);
+        if (error.response && error.response.data.errors) {
+          // Récupérer les erreurs détaillées
+          this.error = error.response.data.errors.map((e) => e.message || e);
+        } else {
+          this.error = ['Une erreur est survenue lors de l’ajout d\'une reservation.'];
+        }
+        throw error;
       }
     },
-        
+
+    // Mettre à jour une réservation
     async updateReservation(id, updatedReservation) {
+      this.loading = true;
+      this.validationErrors = []; // Réinitialiser les erreurs
+      this.error = null;
       try {
-        // Met à jour la réservation via l'API
         const response = await axiosInstance.put(`/reservations/edit/${id}`, updatedReservation);
-    
-        // Met à jour localement l'élément dans le tableau des réservations
         const index = this.reservations.findIndex(reservation => reservation.id === id);
         if (index !== -1) {
           this.reservations[index] = response.data;
         }
-    
-        // Recharge les réservations pour s'assurer que les données sont à jour
-        await this.fetchReservations();
+        Swal.fire('Succès', 'Réservation mise à jour avec succès.', 'success');
       } catch (error) {
-        this.error = "Erreur lors de la mise à jour de la réservation.";
-        console.error(this.error, error);
-        throw error; // Relance l'erreur pour permettre une gestion en amont
-      }
-    },
-    
-    async updateReservationStatus(id, status) {
-      try {
-        // Appelle la méthode updateReservation pour modifier uniquement le statut
-        await this.updateReservation(id, { status });
-      } catch (error) {
-        this.error = "Erreur lors de la mise à jour du statut de la réservation.";
-        console.error(this.error, error);
-        // Vous pouvez personnaliser davantage la gestion des erreurs ici si nécessaire
+        if (error.response?.data?.errors) {
+          // Mettre à jour validationErrors
+          this.validationErrors = error.response.data.errors.map(err => err.message || err);
+        } else {
+          this.error = error.response?.data?.message || 'Erreur lors de la mise à jour de la réservation.';
+        }
+        Swal.fire('Erreur', 'Veuillez vérifier les champs saisis.', 'error');
         throw error;
+      } finally {
+        this.loading = false;
       }
     },
     
+    // Supprimer une réservation
     async deleteReservation(id) {
+      this.loading = true;
+      this.error = null;
       try {
         const response = await axiosInstance.delete(`/reservations/delete/${id}`);
-        // Vérifiez si la suppression est réussie avec le statut 204
         if (response.status === 200 || response.status === 204) {
           this.reservations = this.reservations.filter(reservation => reservation.id !== id);
-          console.log(`Réservation ${id} supprimée avec succès.`);
+          Swal.fire('Succès', 'Réservation supprimée avec succès.', 'success');
         } else {
           throw new Error(`Erreur lors de la suppression. Statut : ${response.status}`);
         }
       } catch (error) {
-        this.error = error.response?.data?.message || 'Erreur lors de la suppression de la réservation';
-        console.error("Erreur:", error);
+        this.error = error.response?.data?.message || 'Erreur lors de la suppression de la réservation.';
         Swal.fire('Erreur', this.error, 'error');
+        throw error;
+      } finally {
+        this.loading = false;
       }
     },
-     
   },
-  persist: true, 
+
+  persist: true,
 });

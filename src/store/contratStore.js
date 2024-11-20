@@ -6,10 +6,10 @@ export const useContractStore = defineStore('contract', {
     contracts: [],
     loading: false,
     error: null,
+    validationErrors: [], 
   }),
 
-  actions: {
-    // Récupérer tous les contrats
+  actions: { 
     async fetchContracts() {
       this.loading = true;
       try {
@@ -17,20 +17,25 @@ export const useContractStore = defineStore('contract', {
         this.contracts = response.data;
       } catch (error) {
         console.error('Erreur lors de la récupération des contrats', error);
-        this.error = 'Erreur lors de la récupération des contrats';
+        this.error = error.response?.data?.message || 'Erreur lors de la récupération des réservations.';
       } finally {
         this.loading = false;
       }
     },
     async addContract(contractData) {
-      console.log('ssssssss',contractData);
-      
+      this.loading = true;
+      this.validationErrors = [];
+      this.error = null;
       try {
         await axiosInstance.post('/contracts/add', contractData);
         await this.fetchContracts(); 
-      } catch (error) {
-        console.error("Erreur lors de l'ajout du contrat", error);
-        this.error = "Erreur lors de l'ajout du contrat";
+      }  catch (error) {
+        if (error.response && error.response.status === 400) {
+          this.validationErrors = error.response.data.erreurs.map(err => err.message);
+        } else {
+          console.error('Erreur inattendue :', error);
+        }
+        throw error;
       }
     },
 
@@ -47,37 +52,47 @@ export const useContractStore = defineStore('contract', {
         this.loading = false;
       }
     },
-    async updateContract(id, updatedData) {
+    async updateContract(id, contractData) {
       try {
-        await axiosInstance.put(`/contracts/update/${id}`, updatedData);
-        await this.fetchContracts();
+        await axios.put(`/contracts/update/${id}`, contractData);
+        this.validationErrors = [];
       } catch (error) {
-        console.error("Erreur lors de la mise à jour du contrat", error);
-        this.error = "Erreur lors de la mise à jour du contrat";
-      }
-    },
-    async updateContractStatus(id, status) {
-      try {
-        
-        await this.updateContract(id, { status });
-      } catch (error) {
-        this.error = "Erreur lors de la mise à jour du statut de la contrat.";
-        console.error(this.error, error);
-        // Vous pouvez personnaliser davantage la gestion des erreurs ici si nécessaire
+        if (error.response && error.response.data && error.response.data.erreurs) {
+          this.validationErrors = error.response.data.erreurs;
+        } else {
+          console.error(error);
+        }
         throw error;
       }
     },
-   
+
+    async updateContract(id, contractData) {
+      try {
+        const response = await axiosInstance.put(`/contracts/update/${id}`, contractData);
+        this.validationErrors = [];
+        return response.data; // Retourne les données mises à jour pour validation
+      } catch (error) {
+        if (error.response && error.response.data && error.response.data.errors) {
+          this.validationErrors = error.response.data.errors.map(err => err.message || err);
+        } else {
+          this.validationErrors = ['Erreur lors de la mise à jour du contrat.'];
+        }
+        throw error;
+      }
+    },
+    
 
     // Obtenir les détails d'un contrat par ID
     async getContractById(id) {
+      this.loading = true;
+      this.error = null;
       try {
         const response = await axiosInstance.get(`/contracts/${id}`);
         return response.data;
-      } catch (error) {
+      }catch (error) {
         console.error("Erreur lors de la récupération des détails du contrat", error);
-        this.error = "Erreur lors de la récupération des détails du contrat";
-        return null;
+          this.error = error.response?.data?.message || 'Erreur lors de la récupération de la réservation.';
+          throw error;
       }
     }
   },

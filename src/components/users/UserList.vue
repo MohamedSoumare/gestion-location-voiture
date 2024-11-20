@@ -93,7 +93,7 @@ const remove = async (id) => {
 
 <style scoped>
 .container {
-  max-width: 1000px;
+  max-width: 1200px;
   margin: auto;
 }
 </style>

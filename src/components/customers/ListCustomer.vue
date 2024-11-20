@@ -28,7 +28,7 @@
           <td>{{ customer.fullName }}</td>
           <td>{{ customer.address }}</td>
           <td>{{ customer.nni }}</td>
-          <td>{{ customer.birthDate }}</td>
+          <td>{{ formatDate(customer.birthDate) }}</td>
           <td>{{ customer.drivingLicense }}</td>
           <td>{{ customer.phoneNumber }}</td>
           <td>
@@ -92,6 +92,9 @@ const confirmDeleteCustomer = (id) => {
     }
   });
 };
+
+const formatDate = date => new Date(date).toLocaleDateString('fr-FR');
+
 const goToAddCustomer = () => router.push({ name: 'CustomerAdd' });
 onMounted(fetchCustomers);
 </script>

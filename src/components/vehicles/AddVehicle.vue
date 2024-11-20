@@ -1,6 +1,15 @@
 <template>
   <div class="container">
     <h2>Ajouter un véhicule</h2>
+
+  <!-- Affichage des erreurs -->
+  <div v-if="storeError && storeError.length" class="alert alert-danger">
+      <ul>
+        <li v-for="(error, index) in storeError" :key="index">
+          {{ error }}
+        </li>
+      </ul>
+    </div>
     <form @submit.prevent="submitForm" class="form-layout mt-3">
       <div class="form-group">
         <label for="brand">Marque</label>
@@ -78,7 +87,7 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useVehicleStore } from '../../store/vehicleStore';
 import { useRouter } from 'vue-router';
 
@@ -86,6 +95,7 @@ export default {
   setup() {
     const vehicleStore = useVehicleStore();
     const router = useRouter();
+
     const vehicle = ref({
       brand: '',
       model: '',
@@ -101,20 +111,21 @@ export default {
       dailyRate: 0.0
     });
 
+    const storeError = computed(() => vehicleStore.error);
+
     async function submitForm() {
-      await vehicleStore.addVehicle(vehicle.value);
-      router.push({ name: 'ListVehicle' });
+      try {
+        await vehicleStore.addVehicle(vehicle.value);
+        router.push({ name: 'ListVehicle' });
+      } catch (error) {
+        console.error("Erreur lors de l'ajout du véhicule :", error);
+      }
     }
 
-    function goBack() {
-      router.push({ name: 'ListVehicle' });
-    }
-
-    return { vehicle, submitForm, goBack };
-  },
+    return { vehicle, storeError, submitForm };
+  }
 };
 </script>
-
 <style scoped>
 .container {
   max-width: 800px;
