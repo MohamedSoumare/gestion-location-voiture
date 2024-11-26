@@ -10,7 +10,7 @@
     
     <div v-if="loading">Chargement...</div>
     <div v-if="error" class="alert alert-danger">{{ error }}</div>
-
+    
     <table v-if="!loading && filteredCustomers.length" class="table table-striped table-hover table-bordered mt-3">
       <thead class="table-light">
         <tr>
@@ -87,12 +87,24 @@ const confirmDeleteCustomer = (id) => {
     cancelButtonText: "Annuler",
   }).then(async (result) => {
     if (result.isConfirmed) {
-      await customerStore.deleteCustomer(id);
-      fetchCustomers();
+      const result = await customerStore.deleteCustomer(id);
+      if (result.success) {
+        Swal.fire({
+          title: 'Succès!',
+          text: result.message,
+          icon: 'success',
+        });
+        fetchCustomers();
+      } else {
+        Swal.fire({
+          title: 'Erreur!',
+          text: result.message,
+          icon: 'error',
+        });
+      }
     }
   });
 };
-
 const formatDate = date => new Date(date).toLocaleDateString('fr-FR');
 
 const goToAddCustomer = () => router.push({ name: 'CustomerAdd' });

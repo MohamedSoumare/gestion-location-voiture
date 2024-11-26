@@ -17,7 +17,8 @@
       <div class="col-md-4 mb-4" v-for="vehicle in filteredVehicles" :key="vehicle.id">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">{{ vehicle.brand }} {{ vehicle.model }} ({{ vehicle.year }})</h5>
+            <h5 class="card-title">{{ vehicle.brand }} {{ vehicle.model }}</h5>
+            <h6 class="card-title"><strong>Année : </strong> {{ vehicle.year }}</h6>
             <h6 class="card-subtitle mb-2 text-muted">Immatriculation: {{ vehicle.registrationPlate }}</h6>
             <p class="card-text">
               <strong>Statut :</strong> {{ vehicle.status }}<br />
@@ -81,28 +82,35 @@ export default {
     function editVehicle(id) {
       router.push({ name: 'EditVehicle', params: { id } });
     }
-
     async function confirmDeleteVehicle(id) {
-      const result = await Swal.fire({
-        title: 'Êtes-vous sûr ?',
-        text: "Cette action est irréversible !",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Oui, supprimer',
-        cancelButtonText: 'Annuler'
-      });
+  const result = await Swal.fire({
+    title: 'Êtes-vous sûr ?',
+    text: 'Cette action supprimera définitivement ce véhicule.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Oui, supprimer',
+    cancelButtonText: 'Annuler',
+  });
 
-      if (result.isConfirmed) {
-        try {
-          await vehicleStore.deleteVehicle(id);
-          Swal.fire('Supprimé!', 'Le véhicule a été supprimé.', 'success');
-        } catch (err) {
-          Swal.fire('Erreur', 'Erreur lors de la suppression.', 'error');
-        }
+  if (result.isConfirmed) {
+    try {
+      // Appel API pour supprimer le véhicule
+      await vehicleStore.deleteVehicle(id);
+      Swal.fire('Supprimé !', 'Le véhicule a été supprimé avec succès.', 'success');
+    } catch (error) {
+      // Gestion des erreurs spécifiques
+      if (error.response && error.response.status === 400) {
+        Swal.fire('Erreur', error.response.data.error || "Action non autorisée.", 'error');
+      } else if (error.response && error.response.status === 500) {
+        Swal.fire('Erreur', "Erreur interne lors de la suppression du véhicule.", 'error');
+      } else {
+        Swal.fire('Erreur', "Une erreur inattendue s'est produite.", 'error');
       }
     }
+  }
+}
 
     return {
       searchTerm,

@@ -15,6 +15,7 @@ import french from "./translate/french.json";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap/dist/js/bootstrap.js";
 import '@fortawesome/fontawesome-free/css/all.css';
+import FullCalendar from '@fullcalendar/vue3'
 
 // Configurer i18n pour la gestion des langues
 const i18n = createI18n({
@@ -36,6 +37,7 @@ app.use(pinia);
 app.use(i18n);
 app.use(router);
 app.use(axios);
+app.use(FullCalendar)
 // app.use(Toast,{
 //   position: 'top-right',
 //   timeout: 5000,

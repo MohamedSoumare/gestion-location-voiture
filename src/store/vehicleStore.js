@@ -11,6 +11,7 @@ export const useVehicleStore = defineStore('vehicle', {
 actions: {
     async fetchVehicles() {
       this.loading = true;
+      this.error = null;
       try {
         const response = await axiosInstance.get('/vehicles');
         this.vehicles = Array.isArray(response.data) ? response.data : [];
@@ -41,7 +42,9 @@ actions: {
     async getVehicleById(id) {
       try {
         const response = await axiosInstance.get(`/vehicles/${id}`);
+        await this.fetchVehicles();
         return response.data; // Vérifiez que cela retourne les bonnes données
+        
       } catch (error) {
         console.error("Erreur lors du chargement du véhicule :", error);
         throw error;
@@ -68,13 +71,14 @@ actions: {
       try {
         await axiosInstance.delete(`/vehicles/delete/${id}`);
         this.vehicles = this.vehicles.filter(vehicle => vehicle.id !== id);
+        await this.fetchVehicles();
       } catch (error) {
-        console.error('Erreur lors de la suppression du véhicule:', error); // Correction ici
-        throw error;
+          // throw error.response.data.error; // Renvoie l'erreur pour SweetAlert2
+          throw error;
       } finally {
-        this.loading = false; // Ajout de cette ligne pour stopper le chargement
+        this.loading = false; 
       }
     },
-    
   },
 });
+ 

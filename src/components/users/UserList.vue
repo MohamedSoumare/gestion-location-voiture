@@ -29,7 +29,7 @@
           <td>{{ user.phoneNumber }}</td>
           <td>{{ user.role }}</td>
           <td :class="{ 'text-success': user.status, 'text-danger': !user.status }">
-            {{ user.status ? 'Active' : 'Inactive' }}
+            {{ user.status ? 'Actif' : 'Inactif' }}
           </td>
          <td>
           <button class="btn  btn-outline-primary me-2"  @click="viewDetails(user)">

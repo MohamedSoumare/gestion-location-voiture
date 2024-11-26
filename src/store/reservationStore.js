@@ -43,7 +43,6 @@ export const useReservationStore = defineStore('reservation', {
       }
     },
 
-    // Ajouter une nouvelle réservation
     async addReservation(newReservation) {
       this.loading = true;
       this.validationErrors = [];
@@ -52,16 +51,40 @@ export const useReservationStore = defineStore('reservation', {
         const response = await axiosInstance.post('/reservations/add', newReservation);
         this.reservations.push(response.data);
         Swal.fire('Succès', 'Réservation ajoutée avec succès.', 'success');
+        await this.fetchReservations();
       } catch (error) {
-        if (error.response && error.response.data.errors) {
-          // Récupérer les erreurs détaillées
-          this.error = error.response.data.errors.map((e) => e.message || e);
-        } else {
-          this.error = ['Une erreur est survenue lors de l’ajout d\'une reservation.'];
+        if (error.response?.data?.errors) {
+          this.validationErrors = error.response.data.errors.map(err => 
+            err.message || `Erreur dans le champ ${err.field}`
+          );
         }
+        
+        
+        Swal.fire('Erreur', 'Veuillez vérifier les champs saisis.', 'error');
         throw error;
+      } finally {
+        this.loading = false;
       }
     },
+    // async addReservation(newReservation) {
+    //   this.loading = true;
+    //   this.validationErrors = [];
+    //   this.error = null;
+    //   try {
+    //     const response = await axiosInstance.post('/reservations/add', newReservation);
+    //     this.reservations.push(response.data);
+    //     Swal.fire('Succès', 'Réservation ajoutée avec succès.', 'success');
+    //     await this.fetchReservations();
+    //   } catch (error) {
+    //     if (error.response && error.response.data.errors) {
+    //       // Récupérer les erreurs détaillées
+    //       this.error = error.response.data.errors.map((e) => e.message || e);
+    //     } else {
+    //       this.error = ['Une erreur est survenue lors de l’ajout d\'une reservation.'];
+    //     }
+    //     throw error;
+    //   }
+    // },
 
     // Mettre à jour une réservation
     async updateReservation(id, updatedReservation) {
@@ -75,6 +98,7 @@ export const useReservationStore = defineStore('reservation', {
           this.reservations[index] = response.data;
         }
         Swal.fire('Succès', 'Réservation mise à jour avec succès.', 'success');
+        await this.fetchReservations();
       } catch (error) {
         if (error.response?.data?.errors) {
           // Mettre à jour validationErrors
@@ -83,13 +107,32 @@ export const useReservationStore = defineStore('reservation', {
           this.error = error.response?.data?.message || 'Erreur lors de la mise à jour de la réservation.';
         }
         Swal.fire('Erreur', 'Veuillez vérifier les champs saisis.', 'error');
+
         throw error;
       } finally {
         this.loading = false;
       }
     },
-    
-    // Supprimer une réservation
+    async updatestatusReservation(id, status) {
+      this.loading = true;
+      this.error = null;
+      try {
+        const response = await axiosInstance.put(`/reservations/status/${id}`, { status });
+        const index = this.reservations.findIndex(reservation => reservation.id === id);
+        if (index !== -1) {
+          this.reservations[index].status = status;
+        }
+        Swal.fire('Succès', 'Le statut de la réservation a été mis à jour.', 'success');
+        await this.fetchReservations();
+      } catch (error) {
+        this.error = error.response?.data?.message || 'Erreur lors de la mise à jour du statut.';
+        Swal.fire('Erreur', this.error, 'error');
+        throw error;
+      } finally {
+        this.loading = false;
+      }
+    },
+
     async deleteReservation(id) {
       this.loading = true;
       this.error = null;
@@ -98,6 +141,7 @@ export const useReservationStore = defineStore('reservation', {
         if (response.status === 200 || response.status === 204) {
           this.reservations = this.reservations.filter(reservation => reservation.id !== id);
           Swal.fire('Succès', 'Réservation supprimée avec succès.', 'success');
+          await this.fetchReservations();
         } else {
           throw new Error(`Erreur lors de la suppression. Statut : ${response.status}`);
         }
@@ -110,6 +154,5 @@ export const useReservationStore = defineStore('reservation', {
       }
     },
   },
-
   persist: true,
 });

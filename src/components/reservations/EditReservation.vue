@@ -138,6 +138,10 @@ const handleEditReservation = async () => {
   if (endDate < startDate) {
     validationErrors.value.push("La date de fin doit être supérieure à la date de début.");
   }
+  if (reservation.value.totalAmount <= 0) {
+  validationErrors.value.push("Le montant total doit être un nombre positif.");
+}
+
 
   if (validationErrors.value.length > 0) {
     return; // Stop if validation errors exist
@@ -157,8 +161,10 @@ const handleEditReservation = async () => {
     await reservationStore.updateReservation(reservationId, updatedReservationData);
     router.push('/reservations'); 
   } catch (error) {
-    console.error("Erreur lors de la modification de la réservation :", error);
-  }
+  validationErrors.value.push("Erreur lors de la modification de la réservation.");
+  console.error("Erreur lors de la modification de la réservation :", error);
+}
+
 };
 const goBack = () => router.push({ name: 'ListReservation' });
 </script>

@@ -31,7 +31,7 @@
       </div>
       <div class="mb-3 form-check">
         <input type="checkbox" class="form-check-input" v-model="form.status" />
-        <label class="form-check-label">Active</label>
+        <label class="form-check-label">Actif</label>
       </div>
 
       <div class="d-flex justify-content-between mt-4">

@@ -4,7 +4,7 @@
   <div v-if="storeError && storeError.length" class="alert alert-danger">
   <ul>
     <li v-for="(error, index) in storeError" :key="index">
-      {{ error }}
+      {{ error.message || error }}
     </li>
   </ul>
 </div>
@@ -36,8 +36,8 @@
       <div class="form-group">
         <label for="status">Statut</label>
         <select v-model="vehicle.status" id="status" required>
-          <option value="Available">Disponible</option>
-          <option value="Unavailable">Indisponible</option>
+          <option value="Disponible">Disponible</option>
+          <option value="Indisponible">Indisponible</option>
           <option value="Maintenance">En maintenance</option>
         </select>
       </div>
@@ -119,7 +119,9 @@ onMounted(async () => {
   try {
     const vehicleId = route.params.id;
     const vehicleData = await vehicleStore.getVehicleById(vehicleId);
-    Object.assign(vehicle.value, vehicleData);
+console.log('Données récupérées du véhicule:', vehicleData);
+Object.assign(vehicle.value, vehicleData);
+
   } catch (error) {
     console.error("Erreur lors de la récupération des données du véhicule :", error);
   }

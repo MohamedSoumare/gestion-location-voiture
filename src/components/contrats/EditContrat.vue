@@ -2,29 +2,40 @@
   <div class="container my-4">
     <h2 class="mb-5 d-flex justify-content-center">Modifier le Contrat</h2>
 
+    <!-- Erreurs générales -->
     <div v-if="validationErrors.length" class="alert alert-danger">
-  <ul>
-    <li v-for="(error, index) in validationErrors" :key="index">{{ error }}</li>
-  </ul>
-</div>
+      <ul>
+        <li v-for="(error, index) in validationErrors" :key="index">{{ error }}</li>
+      </ul>
+    </div>
 
+    <!-- Indicateur de chargement -->
+    <div v-if="isLoading" class="text-center my-4">
+      <p>Chargement des données...</p>
+    </div>
 
-    <form @submit.prevent="updateContract">
+    <!-- Formulaire -->
+    <form v-else @submit.prevent="updateContract">
       <div class="row">
         <!-- Numéro de Contrat -->
         <div class="col-md-6 mb-3">
           <label for="contractNumber" class="form-label">Numéro de Contrat</label>
-          <input v-model="contract.contractNumber" type="text" id="contractNumber" class="form-control" required />
+          <input
+            v-model="contract.contractNumber"
+            type="text"
+            id="contractNumber"
+            class="form-control"
+            required
+          />
           <small v-if="fieldErrors.contractNumber" class="text-danger">
-  {{ fieldErrors.contractNumber }}
-</small>
-
+            {{ fieldErrors.contractNumber }}
+          </small>
         </div>
 
         <!-- Client -->
         <div class="col-md-6 mb-3">
           <label for="customer" class="form-label">Client</label>
-          <select v-model="contract.customer_id" class="form-select" required>
+          <select v-model="contract.customer_id" id="customer" class="form-select" required>
             <option v-for="customer in customers" :key="customer.id" :value="customer.id">
               {{ customer.fullName }}
             </option>
@@ -35,7 +46,7 @@
         <!-- Véhicule -->
         <div class="col-md-6 mb-3">
           <label for="vehicle" class="form-label">Véhicule</label>
-          <select v-model="contract.vehicle_id" class="form-select" required>
+          <select v-model="contract.vehicle_id" id="vehicle" class="form-select" required>
             <option v-for="vehicle in vehicles" :key="vehicle.id" :value="vehicle.id">
               {{ vehicle.brand }} {{ vehicle.model }}
             </option>
@@ -46,26 +57,44 @@
         <!-- Dates -->
         <div class="col-md-6 mb-3">
           <label for="startDate" class="form-label">Date de Début</label>
-          <input v-model="contract.startDate" type="date" id="startDate" class="form-control" required />
+          <input
+            v-model="contract.startDate"
+            type="date"
+            id="startDate"
+            class="form-control"
+            required
+          />
           <small v-if="fieldErrors.startDate" class="text-danger">{{ fieldErrors.startDate }}</small>
         </div>
         <div class="col-md-6 mb-3">
           <label for="returnDate" class="form-label">Date de Fin</label>
-          <input v-model="contract.returnDate" type="date" id="returnDate" class="form-control" required />
+          <input
+            v-model="contract.returnDate"
+            type="date"
+            id="returnDate"
+            class="form-control"
+            required
+          />
           <small v-if="fieldErrors.returnDate" class="text-danger">{{ fieldErrors.returnDate }}</small>
         </div>
 
         <!-- Montant -->
         <div class="col-md-6 mb-3">
           <label for="totalAmount" class="form-label">Montant</label>
-          <input v-model="contract.totalAmount" type="number" id="totalAmount" class="form-control" required />
+          <input
+            v-model="contract.totalAmount"
+            type="text"
+            id="totalAmount"
+            class="form-control"
+            required
+          />
           <small v-if="fieldErrors.totalAmount" class="text-danger">{{ fieldErrors.totalAmount }}</small>
         </div>
 
         <!-- Statut -->
         <div class="col-md-6 mb-3">
           <label for="status" class="form-label">Statut</label>
-          <select v-model="contract.status" class="form-select" required>
+          <select v-model="contract.status" id="status" class="form-select" required>
             <option value="EN_ATTENTE">En attente</option>
             <option value="ANNULER">Annuler</option>
             <option value="VALIDER">Valider</option>
@@ -95,6 +124,7 @@ const vehicleStore = useVehicleStore();
 const router = useRouter();
 const route = useRoute();
 
+const isLoading = ref(true);
 const contract = ref({
   contractNumber: '',
   customer_id: null,
@@ -110,39 +140,75 @@ const vehicles = ref([]);
 const validationErrors = ref([]);
 const fieldErrors = ref({});
 
+const validateForm = () => {
+  validationErrors.value = [];
+  fieldErrors.value = {};
+
+  if (!contract.value.contractNumber.trim()) {
+    fieldErrors.value.contractNumber = 'Le numéro de contrat est obligatoire.';
+  }
+  if (!contract.value.customer_id) {
+    fieldErrors.value.customer_id = 'Veuillez sélectionner un client.';
+  }
+  if (!contract.value.vehicle_id) {
+    fieldErrors.value.vehicle_id = 'Veuillez sélectionner un véhicule.';
+  }
+  if (!contract.value.startDate) {
+    fieldErrors.value.startDate = 'La date de début est obligatoire.';
+  }
+  if (!contract.value.returnDate) {
+    fieldErrors.value.returnDate = 'La date de fin est obligatoire.';
+  } else if (new Date(contract.value.startDate) > new Date(contract.value.returnDate)) {
+    fieldErrors.value.returnDate = 'La date de fin doit être après la date de début.';
+  }
+
+  return Object.keys(fieldErrors.value).length === 0;
+};
+
 onMounted(async () => {
   try {
     await customerStore.fetchCustomers();
     await vehicleStore.fetchVehicles();
     customers.value = customerStore.customers;
     vehicles.value = vehicleStore.vehicles;
-    contract.value = await contractStore.getContractById(route.params.id);
+
+    const data = await contractStore.getContractById(route.params.id);
+    contract.value = {
+      ...data,
+      startDate: data.startDate?.split('T')[0] || '',
+      returnDate: data.returnDate?.split('T')[0] || '',
+    };
   } catch (error) {
-    console.error("Erreur lors du chargement des données :", error);
+    validationErrors.value.push('Erreur lors du chargement des données.');
+  } finally {
+    isLoading.value = false;
   }
 });
 
 const updateContract = async () => {
-  validationErrors.value = [];
-  fieldErrors.value = {};
+  if (!validateForm()) return;
 
   try {
-    await contractStore.updateContract(route.params.id, contract.value);
+    const formattedContract = {
+      ...contract.value,
+      startDate: new Date(contract.value.startDate),
+      returnDate: new Date(contract.value.returnDate),
+    };
+    await contractStore.updateContract(route.params.id, formattedContract);
     router.push({ name: 'ListContrat' });
   } catch (error) {
-  if (error.response && error.response.data && error.response.data.erreurs) {
-    error.response.data.erreurs.forEach((err) => {
-      if (err.champ) {
-        fieldErrors.value[err.champ] = err.message;
-      } else {
-        validationErrors.value.push(err.message);
-      }
-    });
-  } else {
-    validationErrors.value.push('Une erreur inattendue est survenue.');
+    if (error.response?.data?.erreurs) {
+      error.response.data.erreurs.forEach((err) => {
+        if (err.champ) {
+          fieldErrors.value[err.champ] = err.message;
+        } else {
+          validationErrors.value.push(err.message);
+        }
+      });
+    } else {
+      validationErrors.value.push('Une erreur inattendue est survenue.');
+    }
   }
-}
-
 };
 
 const goBack = () => router.push({ name: 'ListContrat' });

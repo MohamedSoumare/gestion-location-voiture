@@ -45,7 +45,7 @@ export default {
           confirmButtonText: 'OK'
         });
         // Rediriger vers le tableau de bord
-        router.push({ name: 'dashboard' });
+        router.push({ name: 'Home' });
       } catch (error) {
         // Afficher une alerte d'erreur
         Swal.fire({

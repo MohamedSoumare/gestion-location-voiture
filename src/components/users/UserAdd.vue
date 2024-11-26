@@ -34,7 +34,7 @@
       </div>
       <div class="mb-3 form-check">
         <input type="checkbox" class="form-check-input" v-model="user.status" />
-        <label class="form-check-label">Active</label>
+        <label class="form-check-label">Actif</label>
       </div>
       <div class="d-flex justify-content-between">
         <button type="submit" class="btn btn-success">Enregistrer</button>

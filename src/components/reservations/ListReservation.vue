@@ -67,11 +67,12 @@
             <button
             
               class="btn btn-outline-danger me-3"
-              :disabled="reservation.status === 'CONFIRMER'"
+              v-if="reservation.status !== 'CONFIRMER'"
               @click="confirmDeleteReservation(reservation.id)"
             >
               <i class="fas fa-trash"></i>
             </button>
+        
           </td>
         </tr>
       </tbody>
@@ -182,7 +183,7 @@ const confirmDeleteReservation = async id => {
 
 const updateStatus = async (id, status) => {
   try {
-    await reservationStore.updateReservationStatus(id, status);
+    await reservationStore.updatestatusReservation(id, status);
     Swal.fire('Succès', 'Le statut de la réservation a été mis à jour.', 'success');
   } catch (error) {
     console.error('Erreur lors de la mise à jour du statut:', error.message);

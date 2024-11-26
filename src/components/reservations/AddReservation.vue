@@ -2,14 +2,13 @@
   <div class="container mt-4">
     <h2 class="mb-5 d-flex justify-content-center">Ajouter une Réservation</h2>
 
-    <!-- Affichage des erreurs -->
     <div v-if="validationErrors.length" class="alert alert-danger">
-      <ul>
-        <li v-for="(error, index) in validationErrors" :key="index">
-          {{ error }}
-        </li>
-      </ul>
-    </div>
+  <ul>
+    <li v-for="(error, index) in validationErrors" :key="index">
+      {{ error }}
+    </li>
+  </ul>
+</div>
 
     <!-- Formulaire -->
     <form @submit.prevent="handleAddReservation">
@@ -55,7 +54,13 @@
         <!-- Montant Total -->
         <div class="col-md-6 mb-3">
           <label for="totalAmount" class="form-label">Montant Total</label>
-          <input type="number" v-model="reservation.totalAmount" class="form-control" required />
+          <input
+            type="number"
+            v-model="reservation.totalAmount"
+            class="form-control"
+            min="0"
+            required
+          />
         </div>
 
         <!-- Statut -->
@@ -63,7 +68,6 @@
           <label for="status" class="form-label">Statut</label>
           <select v-model="reservation.status" class="form-select" required>
             <option value="EN_ATTENTE">En attente</option>
-            <option value="ANNULER">Annulée</option>
             <option value="CONFIRMER">Confirmée</option>
           </select>
         </div>
@@ -79,11 +83,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
-import { useRouter } from 'vue-router';
-import { useReservationStore } from '../../store/reservationStore';
-import { useCustomerStore } from '../../store/customerStore';
-import { useVehicleStore } from '../../store/vehicleStore';
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { useReservationStore } from "../../store/reservationStore";
+import { useCustomerStore } from "../../store/customerStore";
+import { useVehicleStore } from "../../store/vehicleStore";
+import Swal from "sweetalert2";
 
 const router = useRouter();
 const reservationStore = useReservationStore();
@@ -93,27 +98,36 @@ const vehicleStore = useVehicleStore();
 const customers = ref([]);
 const vehicles = ref([]);
 const reservation = ref({
-  customer_id: '',
-  vehicle_id: '',
-  startDate: '',
-  endDate: '',
+  customer_id: "",
+  vehicle_id: "",
+  startDate: "",
+  endDate: "",
   totalAmount: 0,
-  status: 'EN_ATTENTE',
+  status: "EN_ATTENTE",
 });
 const validationErrors = ref([]);
 
-const validateDates = () => {
+const validateForm = () => {
   const errors = [];
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toISOString().split("T")[0];
 
-  if (reservation.value.startDate < today) {
-    errors.push('La date de début ne peut pas être dans le passé.');
+  if (!reservation.value.customer_id) {
+    errors.push("Veuillez sélectionner un client.");
   }
-  if (reservation.value.startDate === reservation.value.endDate) {
-    errors.push('La date de retour ne peut pas être identique à la date de début.');
+  if (!reservation.value.vehicle_id) {
+    errors.push("Veuillez sélectionner un véhicule.");
+  }
+  if (!reservation.value.startDate || !reservation.value.endDate) {
+    errors.push("Les dates de début et de fin sont obligatoires.");
+  }
+  if (reservation.value.startDate < today) {
+    errors.push("La date de début ne peut pas être dans le passé.");
   }
   if (new Date(reservation.value.endDate) < new Date(reservation.value.startDate)) {
-    errors.push('La date de fin ne peut pas être antérieure à la date de début.');
+    errors.push("La date de fin ne peut pas être antérieure à la date de début.");
+  }
+  if (!reservation.value.totalAmount || reservation.value.totalAmount <= 0) {
+    errors.push("Le montant total doit être supérieur à 0.");
   }
 
   return errors;
@@ -126,27 +140,42 @@ onMounted(async () => {
     customers.value = customerStore.customers;
     vehicles.value = vehicleStore.vehicles;
   } catch (error) {
-    console.error('Erreur lors du chargement des données :', error);
+    console.error("Erreur lors du chargement des données :", error);
   }
 });
-
 const handleAddReservation = async () => {
-  validationErrors.value = validateDates();
+  // Valider le formulaire côté frontend
+  validationErrors.value = validateForm();
 
   if (validationErrors.value.length > 0) {
+    Swal.fire("Erreur", "Veuillez corriger les erreurs dans le formulaire.", "error");
     return;
   }
 
   try {
+    // Appeler l'API pour ajouter la réservation
     await reservationStore.addReservation(reservation.value);
-    router.push({ name: 'ListReservation' });
+    Swal.fire("Succès", "Réservation ajoutée avec succès.", "success");
+    router.push({ name: "ListReservation" });
   } catch (error) {
-    console.error('Erreur lors de l’ajout de la réservation :', error);
+    console.error("Erreur lors de l'ajout de la réservation :", error);
+
+    // Vérifier si une réponse avec un message d'erreur est disponible
+    if (error.response && error.response.data && error.response.data.error) {
+      // Ajouter le message d'erreur unique renvoyé par l'API à validationErrors
+      validationErrors.value = [error.response.data.error];
+    } else {
+      // En cas d'erreur inconnue, ajouter un message générique
+      validationErrors.value = ["Une erreur est survenue, veuillez réessayer."];
+    }
+
+    // Afficher une alerte pour informer l'utilisateur
+    Swal.fire("Erreur", "Une erreur est survenue lors de l'ajout de la réservation.", "error");
   }
 };
 
-const goBack = () => router.push({ name: 'ListReservation' });
 
+const goBack = () => router.push({ name: "ListReservation" });
 </script>
 
 <style scoped>

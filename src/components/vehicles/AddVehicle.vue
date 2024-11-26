@@ -34,8 +34,7 @@
       <div class="form-group">
         <label for="status">Statut</label>
         <select v-model="vehicle.status" id="status" required class="form-control">
-          <option value="Available">Disponible</option>
-          <option value="Unavailable">Indisponible</option>
+          <option value="Disponible">Disponible</option>
           <option value="Maintenance">En maintenance</option>
         </select>
       </div>
@@ -80,7 +79,7 @@
 
       <div class="button-group">
         <button type="submit" class="btn btn-success">Enregistrer</button>
-        <button type="button" @click="goBack" class="btn btn-secondary">Retour</button>
+        <button type="button" @click="goBack" class="btn btn-secondary flex-end">Retour</button>
       </div>
     </form>
   </div>
@@ -101,7 +100,7 @@ export default {
       model: '',
       year: '',
       registrationPlate: '',
-      status: '',
+      status: 'Disponible',
       seatCount: 0,
       doorCount: 0,
       color: '',
@@ -121,10 +120,15 @@ export default {
         console.error("Erreur lors de l'ajout du véhicule :", error);
       }
     }
+    
+    function goBack() {
+  router.push({ name: 'ListVehicle' });
+}
 
-    return { vehicle, storeError, submitForm };
+    return { vehicle, storeError, submitForm,goBack };
   }
 };
+
 </script>
 <style scoped>
 .container {
