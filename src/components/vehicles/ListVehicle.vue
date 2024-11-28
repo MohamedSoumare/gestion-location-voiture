@@ -37,7 +37,8 @@
               <button @click="editVehicle(vehicle.id)" class="btn btn-outline-secondary btn-sm">
                 <i class="fas fa-edit"></i>
               </button>
-              <button @click="confirmDeleteVehicle(vehicle.id)" class="btn btn-outline-danger btn-sm">
+              <button @click="confirmDeleteVehicle(vehicle.id)"
+              class="btn btn-outline-danger btn-sm">
                 <i class="fas fa-trash"></i>
               </button>
             </div>
@@ -70,7 +71,6 @@ export default {
     onMounted(async () => {
       await vehicleStore.fetchVehicles();
     });
-
     function goToAdd() {
       router.push({ name: 'AddVehicle' });
     }

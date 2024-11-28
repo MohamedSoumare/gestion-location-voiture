@@ -21,9 +21,11 @@ export const useAuthStore = defineStore('auth', {
         // Sauvegarder les tokens et l'utilisateur
         localStorage.setItem('authToken', token);
         localStorage.setItem('refreshToken', refreshToken);
-        this.user = user;
+        // this.user = user;
+        this.user = user || {};
         this.token = token;
         this.isAuthenticated = true;
+        
       } catch (error) {
         this.isAuthenticated = false; // Assurez-vous que l'utilisateur reste non authentifié en cas d'erreur
         const errorMessage = error.response?.data?.message || 'Échec de la connexion. Veuillez réessayer.';
@@ -65,5 +67,8 @@ export const useAuthStore = defineStore('auth', {
         this.token = null;
       }
     }
+  },
+  persist: {
+    enabled: true,
   },
 });

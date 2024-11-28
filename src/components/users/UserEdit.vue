@@ -8,14 +8,14 @@
       </ul>
     </div>
         
-  <form v-if="user" @submit.prevent="updateUser">
+    <form v-if="user" @submit.prevent="updateUser">
       <div class="mb-3">
         <label>Nom Complet:</label>
-        <input v-model="form.fullName" required class="form-control" />
+        <input v-model="form.fullName" class="form-control" />
       </div>
-      <div class="mb-3">  
+      <div class="mb-3">
         <label>Email:</label>
-        <input v-model="form.email" required type="email" class="form-control" />
+        <input v-model="form.email" type="email" class="form-control" />
       </div>
       <div class="mb-3">
         <label>Téléphone:</label>
@@ -23,14 +23,18 @@
       </div>
       <div class="mb-3">
         <label>Rôle:</label>
-        <select  v-model="form.role" required class="form-select" placeholder="Ex: Employé, admin">
+        <select v-model="form.role" class="form-select">
           <option value="">Sélectionner le rôle</option>
           <option value="ADMIN">Admin</option>
           <option value="EMPLOYE">Employé</option>
         </select>
       </div>
       <div class="mb-3 form-check">
-        <input type="checkbox" class="form-check-input" v-model="form.status" />
+        <input
+          type="checkbox"
+          class="form-check-input"
+          v-model="form.status"
+        />
         <label class="form-check-label">Actif</label>
       </div>
 
@@ -41,6 +45,7 @@
     </form>
   </div>
 </template>
+
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -78,19 +83,19 @@ onMounted(async () => {
 
 const updateUser = async () => {
   try {
-    errors.value = []; // Réinitialise les erreurs
+    errors.value = [];
     const updatedData = {
-      fullName: form.fullName,
-      email: form.email,
-      phoneNumber: form.phoneNumber,
-      role: form.role,
-      status: form.status === 'true' || form.status === true,
+      fullName: form.fullName || user.value.fullName,
+      email: form.email || user.value.email,
+      phoneNumber: form.phoneNumber || user.value.phoneNumber,
+      role: form.role || user.value.role,
+      status: form.status === true,
     };
 
     await store.updateUser(route.params.id, updatedData);
     await store.fetchUsers();
     router.push({ name: 'UserList' });
-  }  catch (error) {
+  } catch (error) {
     if (error.response?.data?.errors) {
       errors.value = error.response.data.errors;
     } else {
@@ -98,10 +103,8 @@ const updateUser = async () => {
     }
   }
 };
-
 const cancel = () => router.push({ name: 'UserList' });
 </script>
-
 
 <style scoped>
 .container {

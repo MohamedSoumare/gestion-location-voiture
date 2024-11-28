@@ -1,13 +1,12 @@
 <template>
   <div class="container mt-5">
-    
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h2 class="mb-4">Liste des Utilisateurs</h2>
-    <router-link :to="{ name: 'AddUser' }" class="btn btn btn-primary mt-5">
-      <i class="fa-solid fa-plus"></i> Ajout utilisateur
-    </router-link>
-
+      <router-link :to="{ name: 'AddUser' }" class="btn btn-primary mt-5">
+        <i class="fa-solid fa-plus"></i> Ajout utilisateur
+      </router-link>
     </div>
+
     <div v-if="loading" class="alert alert-info">Chargement...</div>
     <div v-if="error" class="alert alert-danger">{{ error }}</div>
 
@@ -31,21 +30,20 @@
           <td :class="{ 'text-success': user.status, 'text-danger': !user.status }">
             {{ user.status ? 'Actif' : 'Inactif' }}
           </td>
-         <td>
-          <button class="btn  btn-outline-primary me-2"  @click="viewDetails(user)">
+          <td>
+            <button class="btn btn-outline-primary me-2" @click="viewDetails(user)">
               <i class="fas fa-eye"></i>
             </button>
-            <button class="btn  btn-outline-secondary me-2" @click="editUser(user.id)">
+            <button class="btn btn-outline-secondary me-2" @click="editUser(user.id)">
               <i class="fas fa-edit"></i>
             </button>
-            <button class="btn  btn-outline-danger" @click="remove(user.id)">
+            <button class="btn btn-outline-danger" @click="remove(user.id)">
               <i class="fas fa-trash"></i>
             </button>
-         </td>
-        
+          </td>
         </tr>
       </tbody>
-    </table>  
+    </table>
   </div>
 </template>
 
@@ -53,6 +51,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { useUserStore } from '../../store/userStore';
 import { useRouter } from 'vue-router';
+import Swal from 'sweetalert2';
 
 const router = useRouter();
 const store = useUserStore();
@@ -83,10 +82,24 @@ const editUser = (id) => {
 };
 
 const remove = async (id) => {
-  const confirmDelete = window.confirm("Voulez-vous vraiment supprimer cet utilisateur ?");
-  if (confirmDelete) {
-    await store.deleteUser(id);
-    alert("Utilisateur supprimé avec succès !");
+  const { isConfirmed } = await Swal.fire({
+    title: 'Êtes-vous sûr ?',
+    text: "Cette action est irréversible !",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Oui, supprimer',
+    cancelButtonText: 'Annuler'
+  });
+
+  if (isConfirmed) {
+    try {
+      await store.deleteUser(id);
+      Swal.fire('Supprimé !', 'L\'utilisateur a été supprimé avec succès.', 'success');
+    } catch (error) {
+      Swal.fire('Erreur !', 'Une erreur s\'est produite lors de la suppression.', 'error');
+    }
   }
 };
 </script>

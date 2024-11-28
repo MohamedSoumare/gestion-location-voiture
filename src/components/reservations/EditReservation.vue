@@ -44,7 +44,7 @@
 
         <!-- Montant Total -->
         <div class="col-md-6">
-          <label for="totalAmount" class="form-label">Montant Total</label>
+          <label for="totalAmount" class="form-label">Montant partiel</label>
           <input type="number" v-model="reservation.totalAmount" class="form-control" required />
         </div>
 

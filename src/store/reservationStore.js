@@ -22,6 +22,7 @@ export const useReservationStore = defineStore('reservation', {
         this.reservations = response.data;
       } catch (error) {
         this.error = error.response?.data?.message || 'Erreur lors de la récupération des réservations.';
+       
         Swal.fire('Erreur', this.error, 'error');
       } finally {
         this.loading = false;
@@ -154,5 +155,7 @@ export const useReservationStore = defineStore('reservation', {
       }
     },
   },
-  persist: true,
+  persist: {
+    enabled: true,
+  },
 });

@@ -3,9 +3,9 @@
     <!-- Header -->
     <header class="header">
       <div class="header-left">
-        <button @click="toggleSidebar" class="btn btn-outline-secondary">
+        <!-- <button @click="toggleSidebar" class="btn btn-outline-secondary">
           <i class="fas fa-bars"></i>
-        </button>
+        </button> -->
       </div>
       <div class="header-right">
         <select
@@ -22,23 +22,22 @@
           <img
             v-if="user?.profileImage"
             :src="user.profileImage"
-            class="rounded-circle me-2 dropdown-toggle"
+            class="rounded-circle me-2"
             alt="User Profile"
             width="50"
           />
-          <span class="fw-bold user-name">{{ user?.fullName || 'Invité' }}</span>
-          <button class="btn btn-outline-secondary ms-5 d-flex align-items-center mr-5"  @click="onLogout">
-            <i class="fas fa-sign-out-alt me-3"> </i>
-            Déconnexion
+          <!-- Affichage du nom de l'utilisateur -->
+          <span class="fw-bold user-name me-5">{{ user?.fullName || 'Inconnu' }}</span>
+          <button
+            class="btn btn-outline-secondary ms-5 d-flex align-items-center"
+            @click="isAuthenticated ? onLogout() : onLogin()"
+          >
+            <i :class="isAuthenticated ? 'fas fa-sign-out-alt me-3' : 'fas fa-sign-in-alt me-3'"></i>
+            {{ isAuthenticated ? 'Déconnexion' : 'Connexion' }}
           </button>
-        </div>   
-        <!-- <div class="notification">
-          <i class="fas fa-bell"></i>
-          <span class="badge">{{ notifications }}</span>
-        </div> -->
+        </div>
       </div>
     </header>
-
     <!-- Sidebar -->
     <nav class="sidebar">
       <div class="sidebar-header">
@@ -75,16 +74,14 @@
           </router-link>
         </li>
 
-        <li>
-          <router-link to="/users" class="nav-link">
-            <i class="fas fa-user"></i>
-            <span>Utilisateur</span>
-          </router-link>
-        </li>
-        <li>
-        
-        </li>
-      </ul>
+        <li v-if="userRole !== 'ADMIN'">
+  <router-link to="/users" class="nav-link">
+    <i class="fas fa-user"></i>
+    <span>Utilisateur</span>
+  </router-link>
+</li>
+
+          </ul>
     </nav>
 
     <main class="content">
@@ -103,14 +100,20 @@ const isSidebarCollapsed = ref(false);
 const authStore = useAuthStore();
 const router = useRouter();
 
-// Récupération des informations de l'utilisateur connecté
+// Données utilisateur et état d'authentification
 const user = computed(() => authStore.user);
+const isAuthenticated = computed(() => authStore.isAuthenticated);
 
-// Fonction de déconnexion
-   const onLogout = () => {
-      authStore.logout();
-      router.push({ name: 'login' }); // Redirection vers la page de login après déconnexion
-    };
+// Définir un rôle basé sur l'utilisateur connecté
+// const userRole = computed(() => user.value?.role || 'EMPLOYE'); // ADMIN par défaut si nécessaire
+const userRole = computed(() => authStore.user?.role);
+
+
+// Déconnexion
+const onLogout = () => {
+  authStore.logout();
+  router.push({ name: 'login' });
+};
 
 // Fonction pour changer la langue
 function changeLanguage(event) {
@@ -118,10 +121,10 @@ function changeLanguage(event) {
   console.log(`Language changed to: ${selectedLanguage}`);
 }
 
-// Fonction pour basculer la barre latérale
 function toggleSidebar() {
   isSidebarCollapsed.value = !isSidebarCollapsed.value;
 }
+
 </script>
 
 <style scoped>
@@ -134,7 +137,7 @@ function toggleSidebar() {
   margin-left: 80px;
 }
 
-/* Header */
+
 .header {
   width: 100%;
   height: 60px;
@@ -154,30 +157,14 @@ function toggleSidebar() {
   display: flex;
   align-items: center;
   gap: 35px;
+  
 }
 
-.notification {
-  position: relative;
-  font-size: 1.5rem;
-  color: #333;
-}
 
-.notification .badge {
-  position: absolute;
-  top: -5px;
-  right: -10px;
-  background-color: red;
-  color: white;
-  border-radius: 50%;
-  padding: 2px 8px;
-  font-size: 0.75rem;
-}
-
-/* Sidebar */
 .sidebar {
   width: 350px;
-  background-color: #BCBCBC; 
-  color: #BCBCBC;
+  background-color: #F1F1F1;
+  /* color: #333; */
   padding: 30px;
   position: fixed;
   top: 60px;
@@ -187,9 +174,7 @@ function toggleSidebar() {
 }
 
 .sidebar-header {
-  display: flex;
-  align-items: center;
- justify-content: center;
+  text-align: center;
   margin-bottom: 30px;
 }
 
@@ -197,7 +182,7 @@ function toggleSidebar() {
   display: flex;
   align-items: center;
   padding: 15px 35px;
-  gap: 35px;
+  gap: 15px;
   font-size: 1.1rem;
   color: #333;
   text-decoration: none;
@@ -209,57 +194,16 @@ function toggleSidebar() {
   border-radius: 5px;
 }
 
+/* Content */
 .content {
   margin-top: 80px;
   margin-left: 400px;
   width: 85%;
   padding: 10px;
-  background-color: #BCBCBC;
+  background-color: #f9f9f9;
   transition: margin-left 0.3s ease;
 }
-.badge{
-  color: black;
-}
-/* Light Grey Mode */
-body.light-grey-mode {
-  background-color: #f1f1f1;
-  color: #BCBCBC;
-}
 
-.light-grey-mode .header,
-.light-grey-mode .sidebar,
-.light-grey-mode .content {
-  background-color: #f1f1f1;
-}
-
-.light-grey-mode .nav-link {
-  color: #333;
-}
-
-.light-grey-mode .nav-link:hover {
-  background-color: #c0c0c0;
-}
-.table-container {
-  overflow-x: auto;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background-color: #fff;
-}
-
-th, td {
-  padding: 10px;
-  text-align: left;
-  border: 1px solid #ddd;
-}
-
-th {
-  background-color: #f1f1f1;
-} 
-
-/* Responsive Design */
 @media (max-width: 768px) {
   .sidebar {
     width: 80px;
@@ -267,7 +211,6 @@ th {
 
   .content {
     margin-left: 80px;
-    min-width: 800px;
   }
 
   .sidebar-collapsed .sidebar {
@@ -277,6 +220,5 @@ th {
   .sidebar-collapsed .content {
     margin-left: 0;
   }
-  
 }
 </style>

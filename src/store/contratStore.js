@@ -122,4 +122,7 @@ export const useContractStore = defineStore('contract', {
       }
     }
   },
+  persist: {
+    enabled: true,
+  },
 });

@@ -2,13 +2,11 @@
   <div class="container mt-5 p-4 border rounded bg-light shadow">
     <h2 class="text-center text-primary mb-4">Ajouter un Client</h2>
 
-    <div v-if="storeError" class="alert alert-danger">
-      <ul>
-        <li v-for="(error, index) in storeError" :key="index">
-          {{ error }}
-        </li>
-      </ul>
-    </div>
+    <div v-if="storeError && storeError.length" class="alert alert-danger">
+  <ul>
+    <li v-for="(error, index) in storeError" :key="index" v-text="error"></li>
+  </ul>
+</div>
 
     <form @submit.prevent="saveCustomer" class="mt-4">
       <!-- Formulaire pour ajouter un client -->
@@ -66,17 +64,21 @@ const customer = ref({
 // Récupérer les erreurs du store
 const storeError = computed(() => store.error);
 
+
 const saveCustomer = async () => {
   try {
-   
     await store.addCustomer(customer.value);
-    router.push({ name: 'CustomerList' });
+
+    // Redirige si aucune erreur
+    if (!store.error || store.error.length === 0) {
+      router.push({ name: 'CustomerList' });
+    }
   } catch (error) {
-    console.error('Erreur lors de l’ajout du client :', error);
+    console.error('Erreur lors de l\'ajout du client :', error);
   }
 };
-
 const goBack = () => router.push({ name: 'CustomerList' });
+
 </script>
 
 <style scoped>

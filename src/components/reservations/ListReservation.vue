@@ -22,7 +22,7 @@
           <th>Véhicule</th>
           <th>Date de début</th>
           <th>Date de fin</th>
-          <th>Montant total</th>
+          <th>Montant partiel</th>
           <th>Statut</th>
           <th>Actions</th>
         </tr>

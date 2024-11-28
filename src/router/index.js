@@ -112,7 +112,7 @@ import EditReservation from '../components/reservations/EditReservation.vue';
 import DetailsReservation from '../components/reservations/DetailsReservation.vue';
 import EditCustomer from '../components/customers/EditCustomer.vue';
 import Home from '../components/Home.vue';
-
+import ForgetPassword from '../components/authentificate/ForgetPassword.vue';
 
 const routes = [
   
@@ -120,6 +120,7 @@ const routes = [
     path: '/dashboard',
     name: 'dashboard',
     component: Dashboard,
+    
     children: [
       { path: '/home', name: 'Home', component: Home },
       { path: '/users', name: 'UserList', component: UserList },
@@ -179,6 +180,8 @@ const routes = [
       ],
   },
   { path: '/', name: 'login', component: Login },
+  { path: '/forget-password', name: 'forget-pwd', component: ForgetPassword },
+
  
 ];
 
