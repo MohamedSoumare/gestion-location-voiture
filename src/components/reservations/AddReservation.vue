@@ -58,7 +58,9 @@
             type="number"
             v-model="reservation.totalAmount"
             class="form-control"
-            min="0"
+             step="0.01"
+  max="9999999999.99"
+
             required
           />
         </div>
@@ -128,6 +130,12 @@ const validateForm = () => {
   }
   if (!reservation.value.totalAmount || reservation.value.totalAmount <= 0) {
     errors.push("Le montant total doit être supérieur à 0.");
+  }
+   
+  const totalAmountString = reservation.value.totalAmount.toString();
+  const [integerPart, decimalPart] = totalAmountString.split(".");
+  if (integerPart.length > 8 || (decimalPart && decimalPart.length > 2)) {
+    errors.push("Le montant total ne doit pas dépasser 10 chiffres au total");
   }
 
   return errors;

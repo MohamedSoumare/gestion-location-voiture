@@ -45,7 +45,11 @@
         <!-- Montant Total -->
         <div class="col-md-6">
           <label for="totalAmount" class="form-label">Montant partiel</label>
-          <input type="number" v-model="reservation.totalAmount" class="form-control" required />
+          <input type="number" v-model="reservation.totalAmount"  class="form-control" 
+          step="0.01"
+  max="9999999999.99"
+
+           required />
         </div>
 
         <!-- Statut -->
@@ -142,6 +146,9 @@ const handleEditReservation = async () => {
   validationErrors.value.push("Le montant total doit être un nombre positif.");
 }
 
+if (reservation.value.totalAmount.toString().length > 10) {
+  validationErrors.value.push("Le montant total ne doit pas dépasser 10 chiffres.");
+}
 
   if (validationErrors.value.length > 0) {
     return; // Stop if validation errors exist

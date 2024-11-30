@@ -23,6 +23,7 @@ export const useAuthStore = defineStore('auth', {
         localStorage.setItem('refreshToken', refreshToken);
         // this.user = user;
         this.user = user || {};
+        console.log("Utilisateur après connexion :", this.user);
         this.token = token;
         this.isAuthenticated = true;
         

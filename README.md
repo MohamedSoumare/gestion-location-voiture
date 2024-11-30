@@ -4,11 +4,18 @@ Ce projet frontend est conçu pour faciliter la gestion des agences de location 
 
 ## Prérequis
 
-Avant d'installer et d'exécuter ce projet, assurez-vous d'avoir les éléments suivants :
+Avant de démarrer, assurez-vous d'avoir installé les logiciels suivants :
 
 - Git : Pour cloner le dépôt et gérer les versions du code.
 - Node.js (version 14 ou supérieure) : Pour exécuter le code
 - Vue CLI pour créer et gérer le projet Vue.js
+
+## Technologies Utilisées
+
+- **Vue.js 3** : Framework JavaScript progressif pour la création d'interfaces utilisateur réactives.
+- **Bootstrap** : Framework CSS pour concevoir une interface utilisateur responsive.
+- **Pinia** : Gestion d'état pour Vue.js, utilisé pour gérer les données de l'application.
+- **Axios** : Utilisé pour effectuer des appels API vers le backend.
 
 ## Installation
 
@@ -49,3 +56,8 @@ Avant d'installer et d'exécuter ce projet, assurez-vous d'avoir les éléments 
 ## Auteur
 
 ### [Mohamed Bakary Soumaré](https://github.com/MohamedSoumare/)
+
+## Contact
+
+- Email : mohamedsoumare17763@gmail.com
+- Projet Link: [https://github.com/MohamedSoumare/gestion-location-voiture-frontend.git](https://github.com/MohamedSoumare/gestion-location-voiture-frontend.git)

@@ -22,8 +22,7 @@ export const useUserStore = defineStore('user', {
         this.loading = false;
       }
     },
-
-    async addUser(userData) {
+      async addUser(userData) {
       try {
         await axiosInstance.post('/users/add', userData);
         await this.fetchUsers();
@@ -62,6 +61,51 @@ export const useUserStore = defineStore('user', {
         this.error = error.response?.data?.message || 'Erreur lors de la suppression de l\'utilisateur';
       }
     },
+
+
+    // Dans le store userStore.js
+async fetchProfile() {
+  try {
+    const response = await axiosInstance.get('/users/profile');
+    return response.data.user;
+  } catch (error) {
+    this.error = error.response?.data?.message || 'Erreur lors de la récupération du profil';
+    throw error;
+  }
+},
+      // Mettre à jour le profil
+      async updateProfile(updatedData) {
+        try {
+          await axiosInstance.put('/users/update-profile', updatedData);
+          await this.fetchProfile();
+        } catch (error) {
+          this.error = error.response?.data?.message || 'Erreur lors de la mise à jour du profil';
+          throw error;
+        }
+      },
+  
+      async getProfile(updatedData) {
+        try {
+          await axiosInstance.get('/users/profile', updatedData);
+          await this.fetchProfile();
+        } catch (error) {
+          this.error = error.response?.data?.message || 'Erreur lors de la mise à jour du profil';
+          throw error;
+        }
+      },
+
+      // Changer le mot de passe
+      async updatePassword(currentPassword, newPassword) {
+        try {
+          await axiosInstance.put('/profile/update-password', {
+            currentPassword,
+            newPassword,
+          });
+        } catch (error) {
+          this.error = error.response?.data?.message || 'Erreur lors de la mise à jour du mot de passe';
+          throw error;
+        }
+      },
   },
   persist: {
     enabled: true,

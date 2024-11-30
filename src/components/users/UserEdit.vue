@@ -1,10 +1,10 @@
-<template> 
+<template>
   <div class="container mt-5">
     <h3 class="text-center">Modifier l'utilisateur</h3>
 
     <div v-if="errors.length" class="alert alert-danger">
       <ul>
-        <li v-for="(error, index) in errors" :key="index">{{ error.message }}</li>
+        <li v-for="(error, index) in errors" :key="index">{{ error }}</li>
       </ul>
     </div>
         
@@ -21,6 +21,21 @@
         <label>Téléphone:</label>
         <input v-model="form.phoneNumber" type="text" class="form-control" />
       </div>
+      <div class="mb-3 position-relative">
+        <label>Mot de Passe:</label>
+        <input
+          :type="isPasswordVisible ? 'text' : 'password'"
+          v-model="form.password"
+          required
+          class="form-control"
+        />
+        <span class="toggle-password" @click="togglePasswordVisibility">
+          <i
+            :class="isPasswordVisible ? 'fas fa-eye-slash' : 'fas fa-eye'"
+          ></i>
+        </span>
+      </div>
+
       <div class="mb-3">
         <label>Rôle:</label>
         <select v-model="form.role" class="form-select">
@@ -30,11 +45,7 @@
         </select>
       </div>
       <div class="mb-3 form-check">
-        <input
-          type="checkbox"
-          class="form-check-input"
-          v-model="form.status"
-        />
+        <input type="checkbox" class="form-check-input" v-model="form.status" />
         <label class="form-check-label">Actif</label>
       </div>
 
@@ -55,15 +66,21 @@ const route = useRoute();
 const router = useRouter();
 const store = useUserStore();
 const user = ref(null);
-const errors = ref([]); // Stocke les messages d'erreur
+const errors = ref([]);
 
 const form = reactive({
-  fullName: "",
-  email: "",
-  phoneNumber: "",
-  role: "",
+  fullName: '',
+  email: '',
+  phoneNumber: '',
+  password: '', // Mot de passe initialisé vide
+  role: '',
   status: true,
 });
+const isPasswordVisible = ref(false);
+
+const togglePasswordVisibility = () => {
+  isPasswordVisible.value = !isPasswordVisible.value;
+};
 
 onMounted(async () => {
   try {
@@ -71,13 +88,14 @@ onMounted(async () => {
     if (fetchedUser) {
       user.value = fetchedUser;
       Object.assign(form, fetchedUser);
+      form.password = ''; // Ne pas afficher le mot de passe existant
     } else {
-      alert("Utilisateur non trouvé.");
+      alert('Utilisateur non trouvé.');
       router.push({ name: 'UserList' });
     }
   } catch (error) {
-    alert("Erreur lors de la récupération de l'utilisateur.");
-    console.error("Erreur lors de la récupération de l'utilisateur:", error);
+    alert('Erreur lors de la récupération de l\'utilisateur.');
+    console.error('Erreur:', error);
   }
 });
 
@@ -89,8 +107,13 @@ const updateUser = async () => {
       email: form.email || user.value.email,
       phoneNumber: form.phoneNumber || user.value.phoneNumber,
       role: form.role || user.value.role,
-      status: form.status === true,
+      status: form.status,
     };
+
+    // Inclure le mot de passe seulement si un nouveau est fourni
+    if (form.password) {
+      updatedData.password = form.password;
+    }
 
     await store.updateUser(route.params.id, updatedData);
     await store.fetchUsers();
@@ -103,6 +126,7 @@ const updateUser = async () => {
     }
   }
 };
+
 const cancel = () => router.push({ name: 'UserList' });
 </script>
 
@@ -111,4 +135,26 @@ const cancel = () => router.push({ name: 'UserList' });
   max-width: 500px;
   margin: auto;
 }
+
+.position-relative {
+  position: relative;
+}
+
+.toggle-password {
+  position: absolute;
+  top: 72%;
+  right: 10px;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.toggle-password i {
+  font-size: 1.2rem;
+  color: #6c757d;
+}
+
+.toggle-password:hover i {
+  color: #495057;
+}
+
 </style>

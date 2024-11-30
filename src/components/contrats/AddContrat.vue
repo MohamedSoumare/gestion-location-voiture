@@ -84,7 +84,8 @@
             v-model="newContract.totalAmount"
             type="number"
             id="totalAmount"
-            class="form-control"
+            step="0.01"
+            max="9999999999.99"
             required
           />
         </div>
@@ -166,6 +167,12 @@ const validateForm = () => {
   if (newContract.value.totalAmount <= 0) {
     errors.push('Le montant doit être supérieur à zéro.');
   }
+  if (newContract.value.totalAmount <= 0) {
+    errors.push('Le montant doit être supérieur à zéro.');
+  } else if (newContract.value.totalAmount.toString().length > 10) {
+    errors.push('Le montant total ne doit pas dépasser 10 chiffres.');
+  }
+
   return errors;
 };
 

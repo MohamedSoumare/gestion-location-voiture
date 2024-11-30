@@ -82,12 +82,16 @@
         <div class="col-md-6 mb-3">
           <label for="totalAmount" class="form-label">Montant</label>
           <input
-            v-model="contract.totalAmount"
-            type="text"
-            id="totalAmount"
-            class="form-control"
-            required
-          />
+  v-model="contract.totalAmount"
+  type="number"
+  id="totalAmount"
+  class="form-control"
+  step="0.01"
+  max="9999999999.99"
+  required
+/>
+         
+
           <small v-if="fieldErrors.totalAmount" class="text-danger">{{ fieldErrors.totalAmount }}</small>
         </div>
 
@@ -161,7 +165,13 @@ const validateForm = () => {
   } else if (new Date(contract.value.startDate) > new Date(contract.value.returnDate)) {
     fieldErrors.value.returnDate = 'La date de fin doit être après la date de début.';
   }
-
+  
+  if (!contract.value.totalAmount.toString().trim()) {
+    fieldErrors.value.totalAmount = 'Le montant est obligatoire.';
+  } else if (!/^\d{1,10}(\.\d{1,2})?$/.test(contract.value.totalAmount)) {
+    fieldErrors.value.totalAmount =
+      'Le montant doit être un nombre positif avec jusqu’à 10 chiffres.';
+  }
   return Object.keys(fieldErrors.value).length === 0;
 };
 

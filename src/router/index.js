@@ -113,6 +113,7 @@ import DetailsReservation from '../components/reservations/DetailsReservation.vu
 import EditCustomer from '../components/customers/EditCustomer.vue';
 import Home from '../components/Home.vue';
 import ForgetPassword from '../components/authentificate/ForgetPassword.vue';
+import Profile from '../components/users/Profile.vue';
 
 const routes = [
   
@@ -177,6 +178,7 @@ const routes = [
       { path: '/contrats/add', name: 'AddContrat', component: AddContrat},
       { path: '/contrats/edit/:id', name: 'EditContrat', component: EditContrat },
       { path: '/contrats/details/:id', name: 'DetailsContrat', component: DetailsContrat },
+      { path: '/users/profile', name: 'Profile', component: Profile}
       ],
   },
   { path: '/', name: 'login', component: Login },

@@ -177,7 +177,14 @@ const confirmDeleteReservation = async id => {
   });
 
   if (result.isConfirmed) {
-    await deleteReservation(id);
+    try {
+      await deleteReservation(id);
+      Swal.fire('Succès', 'La réservation a été supprimée avec succès.', 'success');
+      window.location.reload(); // Recharger la page entière
+    } catch (error) {
+      Swal.fire('Erreur', 'Impossible de supprimer la réservation.', 'error');
+      console.error(error.message);
+    }
   }
 };
 

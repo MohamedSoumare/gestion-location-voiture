@@ -31,9 +31,9 @@
         <button type="submit" class="btn btn-primary w-100">Connexion</button>
       </form>
       <div class="mt-3 text-center">
-        <router-link to="/forget-password" class="text-decoration-none">
+        <!-- <router-link to="/forget-password" class="text-decoration-none">
           <i class="bi bi-key"></i> Mot de passe oublié
-        </router-link>
+        </router-link> -->
       </div>
     </div>
   </div>
@@ -69,7 +69,7 @@ export default {
         router.push({ name: "Home" });
       } catch (error) {
         Swal.fire({
-          title: "Erreur de connexion",
+          title: "Erreur de connexion, Veuillez vérifier vos informations",
           text:
             error.message || "Impossible de se connecter. Veuillez réessayer.",
           icon: "error",
