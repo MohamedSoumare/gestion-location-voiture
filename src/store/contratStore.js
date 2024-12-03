@@ -10,6 +10,7 @@ export const useContractStore = defineStore('contract', {
   }),
 
   actions: { 
+
     async fetchContracts() {
       this.loading = true;
       this.error = null;
@@ -31,6 +32,8 @@ export const useContractStore = defineStore('contract', {
         await axiosInstance.post('/contracts/add', contractData);
         await this.fetchContracts(); 
       } catch (error) {
+        if (error.response && error.response.data && error.response.data.error) {
+          this.errorMessage = error.response.data.error}
         if (error.response) {
           // Gérer différentes structures possibles de réponse d'erreur
           if (error.response.data.erreurs) {

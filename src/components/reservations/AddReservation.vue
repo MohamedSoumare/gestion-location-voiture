@@ -163,9 +163,11 @@ const handleAddReservation = async () => {
   try {
     // Appeler l'API pour ajouter la réservation
     await reservationStore.addReservation(reservation.value);
-    Swal.fire("Succès", "Réservation ajoutée avec succès.", "success");
+    await reservationStore.fetchReservations(); 
+    Swal.fire("Succès", "Réservation ajoutée.", "success");
     router.push({ name: "ListReservation" });
-  } catch (error) {
+    } catch (error) {
+      
     console.error("Erreur lors de l'ajout de la réservation :", error);
 
     // Vérifier si une réponse avec un message d'erreur est disponible

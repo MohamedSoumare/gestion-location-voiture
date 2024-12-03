@@ -1,14 +1,14 @@
 <template>
   <div class="container my-4">
-    <h2 class="mb-5 d-flex justify-content-center">Ajouter un nouveau contrat</h2>
+    <h2 class="mb-5 text-center">Ajouter un nouveau contrat</h2>
 
     <!-- Affichage des erreurs de validation -->
- <!-- Affichage des erreurs de validation -->
-<div v-if="validationErrors.length" class="alert alert-danger">
-  <ul>
-    <li v-for="error in validationErrors" :key="error">{{ error }}</li>
-  </ul>
-</div>
+    <div v-if="validationErrors.length" class="alert alert-danger" role="alert" aria-live="assertive">
+      <ul>
+        <li v-for="(error, index) in validationErrors" :key="index">{{ error.message }}</li>
+      </ul>
+    </div>
+    
     <form @submit.prevent="submitContract">
       <div class="row g-4">
         <!-- Numéro de Contrat -->
@@ -20,13 +20,14 @@
             id="contractNumber"
             class="form-control"
             required
+            aria-required="true"
           />
         </div>
 
         <!-- Client -->
         <div class="col-md-6">
           <label for="customer" class="form-label">Client</label>
-          <select v-model="newContract.customer_id" class="form-select" required>
+          <select v-model="newContract.customer_id" class="form-select" required aria-required="true">
             <option disabled value="">Sélectionner un Client</option>
             <option
               v-for="customer in customers"
@@ -41,7 +42,7 @@
         <!-- Véhicule -->
         <div class="col-md-6">
           <label for="vehicle" class="form-label">Véhicule</label>
-          <select v-model="newContract.vehicle_id" class="form-select" required>
+          <select v-model="newContract.vehicle_id" class="form-select" required aria-required="true">
             <option disabled value="">Sélectionner un Véhicule</option>
             <option
               v-for="vehicle in vehicles"
@@ -62,6 +63,7 @@
             id="startDate"
             class="form-control"
             required
+            aria-required="true"
           />
         </div>
 
@@ -74,6 +76,7 @@
             id="returnDate"
             class="form-control"
             required
+            aria-required="true"
           />
         </div>
 
@@ -85,8 +88,11 @@
             type="number"
             id="totalAmount"
             step="0.01"
+            min="0"
             max="9999999999.99"
             required
+            class="form-control" 
+            aria-required="true"
           />
         </div>
 
@@ -114,6 +120,7 @@ import { useContractStore } from '../../store/contratStore';
 import { useCustomerStore } from '../../store/customerStore';
 import { useVehicleStore } from '../../store/vehicleStore';
 import { useRouter } from 'vue-router';
+import Swal from 'sweetalert2';
 
 const contractStore = useContractStore();
 const customerStore = useCustomerStore();
@@ -135,48 +142,55 @@ const vehicles = ref([]);
 const validationErrors = ref([]);
 
 onMounted(async () => {
-  await customerStore.fetchCustomers();
-  await vehicleStore.fetchVehicles();
-  customers.value = customerStore.customers;
-  vehicles.value = vehicleStore.vehicles;
+  try {
+    await customerStore.fetchCustomers();
+    await vehicleStore.fetchVehicles();
+    customers.value = customerStore.customers;
+    vehicles.value = vehicleStore.vehicles;
+  } catch (error) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Erreur de chargement',
+      text: 'Impossible de charger les clients ou les véhicules',
+    });
+  }
 });
 
 const validateForm = () => {
   const errors = [];
   const today = new Date().toISOString().split('T')[0];
 
-  if (!newContract.value.contractNumber) {
-    errors.push('Le numéro de contrat est obligatoire.');
+  if (!newContract.value.contractNumber.trim()) {
+    errors.push({ message: 'Le numéro de contrat est obligatoire.' });
   }
   if (!newContract.value.customer_id) {
-    errors.push('Le client est obligatoire.');
+    errors.push({ message: 'Le client est obligatoire.' });
   }
   if (!newContract.value.vehicle_id) {
-    errors.push('Le véhicule est obligatoire.');
+    errors.push({ message: 'Le véhicule est obligatoire.' });
   }
   if (!newContract.value.startDate) {
-    errors.push('La date de début est obligatoire.');
+    errors.push({ message: 'La date de début est obligatoire.' });
   } else if (newContract.value.startDate < today) {
-    errors.push('La date de début ne peut pas être dans le passé.');
+    errors.push({ message: 'La date de début ne peut pas être dans le passé.' });
   }
   if (!newContract.value.returnDate) {
-    errors.push('La date de fin est obligatoire.');
+    errors.push({ message: 'La date de fin est obligatoire.' });
   } else if (new Date(newContract.value.returnDate) < new Date(newContract.value.startDate)) {
-    errors.push('La date de fin ne peut pas être antérieure à la date de début.');
+    errors.push({ message: 'La date de fin ne peut pas être antérieure à la date de début.' });
   }
-  if (newContract.value.totalAmount <= 0) {
-    errors.push('Le montant doit être supérieur à zéro.');
+  if (Number(newContract.value.totalAmount) <= 0) {
+    errors.push({ message: 'Le montant doit être supérieur à zéro.' });
   }
-  if (newContract.value.totalAmount <= 0) {
-    errors.push('Le montant doit être supérieur à zéro.');
-  } else if (newContract.value.totalAmount.toString().length > 10) {
-    errors.push('Le montant total ne doit pas dépasser 10 chiffres.');
+  if (newContract.value.totalAmount.toString().length > 10) {
+    errors.push({ message: 'Le montant total ne doit pas dépasser 10 chiffres.' });
   }
 
   return errors;
 };
 
 const submitContract = async () => {
+  // Validation frontend
   validationErrors.value = validateForm();
 
   if (validationErrors.value.length > 0) {
@@ -185,11 +199,33 @@ const submitContract = async () => {
 
   try {
     await contractStore.addContract(newContract.value);
-    router.push({ name: 'ListContrat' }); // Redirige vers la liste des contrats après ajout
+    Swal.fire({
+      icon: 'success',
+      title: 'Contrat ajouté',
+      text: 'Le contrat a été ajouté avec succès',
+    });
+    router.push({ name: 'ListContrat' });
   } catch (error) {
-    console.error('Erreur lors de l\'ajout du contrat :', error);
-    if (contractStore.validationErrors.length > 0) {
-      validationErrors.value = contractStore.validationErrors;
+    // Gestion des erreurs retournées par le backend
+    if (error.response && error.response.data && error.response.data.errors) {
+      // Vérifier si c'est un tableau de chaînes ou d'objets
+      if (typeof error.response.data.errors[0] === 'string') {
+        // Si c'est un tableau de chaînes
+        validationErrors.value = error.response.data.errors.map((err) => ({
+          message: err,
+        }));
+      } else {
+        // Si c'est un tableau d'objets
+        validationErrors.value = error.response.data.errors.map((err) => ({
+          message: err.msg || err.message || 'Une erreur est survenue.',
+        }));
+      }
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Erreur',
+        text: 'Impossible d\'ajouter le contrat',
+      });
     }
   }
 };
@@ -206,18 +242,5 @@ const goBack = () => {
 }
 button {
   margin: 5px;
-}
-.table th, .table td {
-  text-align: center;
-}
-.table thead th {
-  background-color: #2f6690;
-  color: white;
-}
-.table tbody tr:hover {
-  background-color: #f1f1f1;
-}
-.btn i {
-  font-size: 1rem;
 }
 </style>
