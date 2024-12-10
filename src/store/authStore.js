@@ -49,8 +49,24 @@ export const useAuthStore = defineStore('auth', {
         confirmButtonText: 'OK'
       });
     },
-    
-    
+    async sendOTP(email) {
+      try {
+        const response = await axiosInstance.post('/reset-password', { email });
+        return response.data;
+      } catch (error) {
+        console.error('Erreur d\'OTP:', error.response?.data?.error || error.message);
+        throw new Error(error.response?.data?.error || 'Échec de l\'envoi de l\'OTP.');
+      }
+    },
+    async resetPassword(email, otp, newPassword) {
+      try {
+        const response = await axiosInstance.post('/forgot-password', { email, otp, newPassword });
+        return response.data;
+      } catch (error) {
+        console.error('Erreur de réinitialisation:', error.response?.data?.error || error.message);
+        throw new Error(error.response?.data?.error || 'Échec de la réinitialisation.');
+      }
+    },
 
     checkAuth() {
       const token = getAuthToken();

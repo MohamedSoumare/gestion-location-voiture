@@ -34,7 +34,7 @@
           <td>
             <button class="btn btn-outline-primary me-2" @click="viewCustomer(customer.id)"> <i class="fas fa-eye"></i></button>
             <button class="btn btn-outline-secondary me-2" @click="editCustomer(customer.id)"><i class="fas fa-edit"></i></button>
-            <button class="btn btn-outline-danger me-2" @click="confirmDeleteCustomer(customer.id)"> <i class="fas fa-trash"></i></button>
+            <button class="btn btn-outline-danger me-2" v-if="userRole === 'ADMIN'"  @click="confirmDeleteCustomer(customer.id)"> <i class="fas fa-trash"></i></button>
           </td>
         </tr>
       </tbody>
@@ -47,6 +47,7 @@ import { ref, onMounted } from 'vue';
 import Swal from 'sweetalert2';
 import { useCustomerStore } from '../../store/customerStore';
 import { useRouter } from 'vue-router';
+import { useAuthStore } from '../../store/authStore';
 
 const customerStore = useCustomerStore();
 const router = useRouter();
@@ -55,6 +56,12 @@ const filteredCustomers = ref([]);
 const searchQuery = ref('');
 const loading = ref(false);
 const error = ref(null);
+
+
+
+const authStore = useAuthStore();
+const userRole = authStore.user?.role;
+
 
 const fetchCustomers = async () => {
   loading.value = true;

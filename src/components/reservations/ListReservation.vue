@@ -64,15 +64,22 @@
             >
               <i class="fas fa-edit"></i>
             </button>
-            <button
+            <!-- <button
             
               class="btn btn-outline-danger me-3"
               v-if="reservation.status !== 'CONFIRMER'"
               @click="confirmDeleteReservation(reservation.id)"
             >
               <i class="fas fa-trash"></i>
-            </button>
-        
+            </button> -->
+            <button
+  class="btn btn-outline-danger me-3"
+  v-if="userRole === 'ADMIN' && reservation.status !== 'CONFIRMER'"
+  @click="confirmDeleteReservation(reservation.id)"
+>
+  <i class="fas fa-trash"></i>
+</button>
+
           </td>
         </tr>
       </tbody>
@@ -117,6 +124,11 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useReservationStore } from '../../store/reservationStore';
 import Swal from 'sweetalert2'; 
+import { useAuthStore } from '../../store/authStore';
+
+
+const authStore = useAuthStore();
+const userRole = authStore.user?.role; 
 
 const router = useRouter();
 const reservationStore = useReservationStore();

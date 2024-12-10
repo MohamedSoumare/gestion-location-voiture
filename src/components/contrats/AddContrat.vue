@@ -158,11 +158,17 @@ onMounted(async () => {
 
 const validateForm = () => {
   const errors = [];
+  
+  // Obtenir la date d'aujourd'hui en format YYYY-MM-DD
   const today = new Date().toISOString().split('T')[0];
-
+  
   if (!newContract.value.contractNumber.trim()) {
     errors.push({ message: 'Le numéro de contrat est obligatoire.' });
+  } else if (!/^MRN-CTR-\d{5}$/.test(newContract.value.contractNumber)) {
+    errors.push({ message: 'Le numéro de contrat doit commencer par "MRN-CTR-" suivi de 5 chiffres.' });
   }
+ 
+
   if (!newContract.value.customer_id) {
     errors.push({ message: 'Le client est obligatoire.' });
   }
@@ -171,7 +177,7 @@ const validateForm = () => {
   }
   if (!newContract.value.startDate) {
     errors.push({ message: 'La date de début est obligatoire.' });
-  } else if (newContract.value.startDate < today) {
+  } else if (newContract.value.startDate <= today) {
     errors.push({ message: 'La date de début ne peut pas être dans le passé.' });
   }
   if (!newContract.value.returnDate) {

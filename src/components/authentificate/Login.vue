@@ -30,10 +30,10 @@
         </div>
         <button type="submit" class="btn btn-primary w-100">Connexion</button>
       </form>
-      <div class="mt-3 text-center">
-        <!-- <router-link to="/forget-password" class="text-decoration-none">
-          <i class="bi bi-key"></i> Mot de passe oublié
-        </router-link> -->
+      <div class="mt-3 text-center ">
+        <router-link to="/forgetpasswd" class="text-decoration-none">
+  <i class="bi bi-key"></i> Mot de passe oublié
+</router-link>
       </div>
     </div>
   </div>

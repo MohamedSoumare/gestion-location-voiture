@@ -3,12 +3,12 @@
     <h2 class="mb-5 d-flex justify-content-center">Ajouter une Réservation</h2>
 
     <div v-if="validationErrors.length" class="alert alert-danger">
-  <ul>
-    <li v-for="(error, index) in validationErrors" :key="index">
-      {{ error }}
-    </li>
-  </ul>
-</div>
+      <ul>
+        <li v-for="(error, index) in validationErrors" :key="index">
+          {{ error }}
+        </li>
+      </ul>
+    </div>
 
     <!-- Formulaire -->
     <form @submit.prevent="handleAddReservation">
@@ -58,9 +58,8 @@
             type="number"
             v-model="reservation.totalAmount"
             class="form-control"
-             step="0.01"
-  max="9999999999.99"
-
+            step="0.01"
+            max="9999999999.99"
             required
           />
         </div>
@@ -121,21 +120,23 @@ const validateForm = () => {
   }
   if (!reservation.value.startDate || !reservation.value.endDate) {
     errors.push("Les dates de début et de fin sont obligatoires.");
-  }
-  if (reservation.value.startDate < today) {
-    errors.push("La date de début ne peut pas être dans le passé.");
-  }
-  if (new Date(reservation.value.endDate) < new Date(reservation.value.startDate)) {
-    errors.push("La date de fin ne peut pas être antérieure à la date de début.");
+  } else {
+    if (reservation.value.startDate < today) {
+      errors.push("La date de début ne peut pas être dans le passé.");
+    }
+    if (reservation.value.endDate < reservation.value.startDate) {
+      errors.push("La date de fin ne peut pas être antérieure à la date de début.");
+    }
+    if (reservation.value.endDate === reservation.value.startDate) {
+      errors.push("La date de retour ne peut pas être identique à la date de départ.");
+    }
   }
   if (!reservation.value.totalAmount || reservation.value.totalAmount <= 0) {
     errors.push("Le montant total doit être supérieur à 0.");
   }
-   
-  const totalAmountString = reservation.value.totalAmount.toString();
-  const [integerPart, decimalPart] = totalAmountString.split(".");
+  const [integerPart, decimalPart] = reservation.value.totalAmount.toString().split(".");
   if (integerPart.length > 8 || (decimalPart && decimalPart.length > 2)) {
-    errors.push("Le montant total ne doit pas dépasser 10 chiffres au total");
+    errors.push("Le montant total ne doit pas dépasser 10 chiffres au total.");
   }
 
   return errors;
@@ -151,8 +152,8 @@ onMounted(async () => {
     console.error("Erreur lors du chargement des données :", error);
   }
 });
+
 const handleAddReservation = async () => {
-  // Valider le formulaire côté frontend
   validationErrors.value = validateForm();
 
   if (validationErrors.value.length > 0) {
@@ -161,29 +162,20 @@ const handleAddReservation = async () => {
   }
 
   try {
-    // Appeler l'API pour ajouter la réservation
     await reservationStore.addReservation(reservation.value);
-    await reservationStore.fetchReservations(); 
+    await reservationStore.fetchReservations();
     Swal.fire("Succès", "Réservation ajoutée.", "success");
     router.push({ name: "ListReservation" });
-    } catch (error) {
-      
+  } catch (error) {
     console.error("Erreur lors de l'ajout de la réservation :", error);
-
-    // Vérifier si une réponse avec un message d'erreur est disponible
-    if (error.response && error.response.data && error.response.data.error) {
-      // Ajouter le message d'erreur unique renvoyé par l'API à validationErrors
-      validationErrors.value = [error.response.data.error];
-    } else {
-      // En cas d'erreur inconnue, ajouter un message générique
-      validationErrors.value = ["Une erreur est survenue, veuillez réessayer."];
-    }
-
-    // Afficher une alerte pour informer l'utilisateur
-    Swal.fire("Erreur", "Une erreur est survenue lors de l'ajout de la réservation.", "error");
+    const apiError =
+      error.response && error.response.data && error.response.data.error
+        ? error.response.data.error
+        : "Une erreur est survenue, veuillez réessayer.";
+    validationErrors.value = [apiError];
+    Swal.fire("Erreur", apiError, "error");
   }
 };
-
 
 const goBack = () => router.push({ name: "ListReservation" });
 </script>

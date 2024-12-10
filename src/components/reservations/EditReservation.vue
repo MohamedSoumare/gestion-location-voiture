@@ -20,7 +20,6 @@
             </option>
           </select>
         </div>
-
         <div class="col-md-6">
           <label for="vehicle" class="form-label">Véhicule</label>
           <select v-model="reservation.vehicle_id" class="form-select" required>
@@ -30,13 +29,11 @@
             </option>
           </select>
         </div>
-
         <div class="col-md-6">
           <label for="startDate" class="form-label">Date de début</label>
           <input type="date" v-model="reservation.startDate" class="form-control" required />
         </div>
 
-       
         <div class="col-md-6">
           <label for="endDate" class="form-label">Date de fin</label>
           <input type="date" v-model="reservation.endDate" class="form-control" required />
@@ -102,6 +99,7 @@ const formatDate = (dateString) => {
   return date.toISOString().split('T')[0]; // Format YYYY-MM-DD
 };
 
+
 onMounted(async () => {
   try {
     await customerStore.fetchCustomers();
@@ -114,14 +112,15 @@ onMounted(async () => {
 
     const existingReservation = reservationStore.reservation;
 
-    reservation.value = {
-      customer_id: existingReservation.customer_id,
-      vehicle_id: existingReservation.vehicle_id,
-      startDate: formatDate(existingReservation.startDate),
-      endDate: formatDate(existingReservation.endDate),
-      totalAmount: existingReservation.totalAmount,
-      status: existingReservation.status
-    };
+  reservation.value = {
+  customer_id: existingReservation.customer_id,
+  vehicle_id: existingReservation.vehicle_id,
+  startDate: formatDate(existingReservation.startDate),
+  endDate: formatDate(existingReservation.endDate),
+  totalAmount: existingReservation.totalAmount,
+  status: existingReservation.status
+};
+
   } catch (error) {
     console.error("Erreur lors de la récupération des données :", error);
   }
@@ -156,13 +155,14 @@ if (reservation.value.totalAmount.toString().length > 10) {
 
   try {
     const updatedReservationData = {
-      customer_id: reservation.value.customer_id,
-      vehicle_id: reservation.value.vehicle_id,
-      startDate: reservation.value.startDate,
-      endDate: reservation.value.endDate,
-      totalAmount: reservation.value.totalAmount,
-      status: reservation.value.status || "EN_ATTENTE",
-    };
+  customer_id: reservation.value.customer_id,
+  vehicle_id: reservation.value.vehicle_id,
+  startDate: formatDate(reservation.value.startDate),
+  endDate: formatDate(reservation.value.endDate),
+  totalAmount: reservation.value.totalAmount,
+  status: reservation.value.status || 'EN_ATTENTE',
+};
+
 
     const reservationId = route.params.id;
     await reservationStore.updateReservation(reservationId, updatedReservationData);
@@ -175,6 +175,7 @@ if (reservation.value.totalAmount.toString().length > 10) {
 };
 const goBack = () => router.push({ name: 'ListReservation' });
 </script>
+
 <style scoped>
 .container {
   max-width: 800px;

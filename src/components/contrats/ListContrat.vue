@@ -57,7 +57,7 @@
   </button>
   <!-- Bouton Supprimer, visible uniquement si le statut n'est pas "VALIDER" -->
   <button
-    v-if="contract.status !== 'VALIDER'"
+    v-if="contract.status !== 'VALIDER' && userRole === 'ADMIN'"
     @click="confirmDelete(contract.id)"
     class="btn btn-sm btn-outline-danger me-3"
     title="Supprimer le contrat"
@@ -88,11 +88,17 @@ import { useCustomerStore } from '../../store/customerStore';
 import { useVehicleStore } from '../../store/vehicleStore';
 import { useRouter } from 'vue-router';
 import Swal from 'sweetalert2';
+import { useAuthStore } from '../../store/authStore';
 
 const router = useRouter();
 const contractStore = useContractStore();
 const customerStore = useCustomerStore();
 const vehicleStore = useVehicleStore();
+
+
+
+const authStore = useAuthStore();
+const userRole = authStore.user?.role; 
 
 const contracts = ref([]);
 const customers = ref([]);

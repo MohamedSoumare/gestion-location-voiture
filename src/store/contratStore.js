@@ -61,17 +61,36 @@ export const useContractStore = defineStore('contract', {
       try {
         const response = await axiosInstance.put(`/contracts/update/${id}`, contractData);
         this.validationErrors = [];
-        await this.fetchContracts(); 
+        await this.fetchContracts();
         return response.data;
       } catch (error) {
-        if (error.response && error.response.data && error.response.data.errors) {
-          this.validationErrors = error.response.data.errors.map(err => err.message || err);
+        if (error.response && error.response.data && error.response.data.error) {
+          this.errorMessage = error.response.data.error}
+        if (error.response) {
+          // Gérer différentes structures possibles de réponse d'erreur
+          if (error.response.data.erreurs) {
+            // Structure avec 'erreurs'
+            const errors = error.response?.data?.errors || error.response?.data?.erreurs;
+            validationErrors.value = errors ? errors.map((err) => err.message) : ['Erreur inconnue.'];
+            
+          } else if (error.response.data.errors) {
+            // Structure alternative avec 'errors'
+            this.validationErrors = error.response.data.errors.map(err => 
+              typeof err === 'string' ? err : err.msg
+            );
+          } else {
+            // Message d'erreur générique
+            this.validationErrors = [error.response.data.error || 'Erreur lors de l\'ajout du contrat'];
+          }
         } else {
-          this.validationErrors = ['Erreur lors de la mise à jour du contrat.'];
+          // Erreur sans réponse du serveur
+          this.validationErrors = ['Une erreur réseau est survenue'];
         }
+        
         throw error;
       }
     },
+    
     async updateContractStatus(id, status) {
       this.loading = true;
       this.error = null;

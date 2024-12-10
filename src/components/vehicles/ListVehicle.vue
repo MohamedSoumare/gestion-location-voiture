@@ -38,7 +38,7 @@
                 <i class="fas fa-edit"></i>
               </button>
               <button @click="confirmDeleteVehicle(vehicle.id)"
-              class="btn btn-outline-danger btn-sm">
+              class="btn btn-outline-danger btn-sm" v-if="userRole === 'ADMIN'">
                 <i class="fas fa-trash"></i>
               </button>
             </div>
@@ -50,6 +50,7 @@
 </template>
 <script>
 import { useVehicleStore } from '../../store/vehicleStore';
+import { useAuthStore } from '../../store/authStore';
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import Swal from 'sweetalert2';
@@ -57,20 +58,29 @@ import Swal from 'sweetalert2';
 export default {
   setup() {
     const vehicleStore = useVehicleStore();
+    const authStore = useAuthStore();
     const router = useRouter();
     const searchTerm = ref('');
 
     const filteredVehicles = computed(() => {
+      const term = searchTerm.value.toLowerCase();
       return vehicleStore.vehicles.filter(vehicle =>
-        vehicle.brand.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
-        vehicle.model.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
-        vehicle.registrationPlate.toLowerCase().includes(searchTerm.value.toLowerCase())
+        vehicle.brand.toLowerCase().includes(term) ||
+        vehicle.model.toLowerCase().includes(term) ||
+        vehicle.registrationPlate.toLowerCase().includes(term)
       );
     });
 
+    const userRole = authStore.user?.role;
+
     onMounted(async () => {
-      await vehicleStore.fetchVehicles();
+      try {
+        await vehicleStore.fetchVehicles();
+      } catch (error) {
+        Swal.fire('Erreur', "Impossible de charger les véhicules.", 'error');
+      }
     });
+
     function goToAdd() {
       router.push({ name: 'AddVehicle' });
     }
@@ -82,43 +92,43 @@ export default {
     function editVehicle(id) {
       router.push({ name: 'EditVehicle', params: { id } });
     }
-    async function confirmDeleteVehicle(id) {
-  const result = await Swal.fire({
-    title: 'Êtes-vous sûr ?',
-    text: 'Cette action supprimera définitivement ce véhicule.',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#d33',
-    cancelButtonColor: '#3085d6',
-    confirmButtonText: 'Oui, supprimer',
-    cancelButtonText: 'Annuler',
-  });
 
-  if (result.isConfirmed) {
-    try {
-      // Appel API pour supprimer le véhicule
-      await vehicleStore.deleteVehicle(id);
-      Swal.fire('Supprimé !', 'Le véhicule a été supprimé avec succès.', 'success');
-    } catch (error) {
-      // Gestion des erreurs spécifiques
-      if (error.response && error.response.status === 400) {
-        Swal.fire('Erreur', error.response.data.error || "Action non autorisée.", 'error');
-      } else if (error.response && error.response.status === 500) {
-        Swal.fire('Erreur', "Erreur interne lors de la suppression du véhicule.", 'error');
-      } else {
-        Swal.fire('Erreur', "Une erreur inattendue s'est produite.", 'error');
+    async function confirmDeleteVehicle(id) {
+      const result = await Swal.fire({
+        title: 'Êtes-vous sûr ?',
+        text: 'Cette action supprimera définitivement ce véhicule.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Oui, supprimer',
+        cancelButtonText: 'Annuler',
+      });
+
+      if (result.isConfirmed) {
+        try {
+          await vehicleStore.deleteVehicle(id);
+          Swal.fire('Supprimé !', 'Le véhicule a été supprimé avec succès.', 'success');
+        } catch (error) {
+          if (error.response && error.response.status === 400) {
+            Swal.fire('Erreur', error.response.data.error || "Action non autorisée.", 'error');
+          } else if (error.response && error.response.status === 500) {
+            Swal.fire('Erreur', "Erreur interne lors de la suppression du véhicule.", 'error');
+          } else {
+            Swal.fire('Erreur', "Une erreur inattendue s'est produite.", 'error');
+          }
+        }
       }
     }
-  }
-}
 
     return {
+      userRole,
       searchTerm,
       filteredVehicles,
       goToAdd,
       viewDetails,
       editVehicle,
-      confirmDeleteVehicle
+      confirmDeleteVehicle,
     };
   }
 };
